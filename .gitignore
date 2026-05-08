@@ -1,0 +1,10 @@
+.vs/
+x64/
+libraries/
+*.dll
+*.exe
+*.obj
+*.pdb
+*.ilk
+*.user
+*.ipch

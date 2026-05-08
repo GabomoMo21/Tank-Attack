@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="JuegoTanks.vcxproj" Id="2eb4eb87-70ee-41e8-8b5b-38067ad00630" />
+</Solution>
