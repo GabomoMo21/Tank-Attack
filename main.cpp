@@ -211,9 +211,6 @@ public:
                 }
             }
         }
-
-        m[1][1] = 2;
-        m[fil - 2][col - 2] = 3;
     }
 };
 
@@ -434,6 +431,40 @@ public:
 
 
 
+class Tank {
+public :
+    int fila;
+    int columna;
+    int tipo;
+
+    Tank(int fila, int columna, int tipo) {
+        this->fila = fila;
+        this->columna = columna;
+        this->tipo = tipo;
+	}
+
+
+    int getfila() {
+        return fila;
+	}
+
+    int getcolumna() {
+        return columna;
+    }
+
+    int gettipo() {
+        return tipo;
+	}
+
+    void move(int nuevaFila, int nuevaColumna) {
+        fila = nuevaFila;
+        columna = nuevaColumna;
+	}
+
+
+
+};
+
 void dibujarRuta(
     sf::RenderWindow& ventana,
     Grafo& grafo,
@@ -501,14 +532,19 @@ void dibujarmapa(
             else if (map.m[i][j] == 1) {
                 dibujarcelda(ventana, pared, i, j, tamanoCelda);
             }
-            else if (map.m[i][j] == 2) {
-                dibujarcelda(ventana, tanque1, i, j, tamanoCelda);
-            }
-            else if (map.m[i][j] == 3) {
-                dibujarcelda(ventana, tanque2, i, j, tamanoCelda);
-            }
         }
     }
+}
+
+void dibujartank(
+    sf::RenderWindow& ventana,
+    Mapa& map,
+    Tank& tank,
+    sf::Texture& texture,
+    float tamanoCelda
+) {
+	dibujarcelda(ventana, texture, tank.getfila(), tank.getcolumna(), tamanoCelda);
+
 }
 
 
@@ -529,6 +565,8 @@ int main()
     Mapa map;
     Grafo grafo;
     Pathfinder pathfinder;
+	Tank tank1(1, 1, 2);
+	Tank tank2(Mapa::fil - 2, Mapa::col - 2, 3);
 
     int camino[Grafo::totalNodos];
     int tamanoCamino = 0;
@@ -577,7 +615,7 @@ int main()
                         columnaDestino < Mapa::col &&
                         map.recorrible(map.m[filaDestino][columnaDestino])
                         ) {
-                        int nodoInicio = pathfinder.buscarNodoValor(map, grafo, 2);
+                        int nodoInicio = grafo.obtenerNodo(tank1.getfila(), tank1.getcolumna());
                         int nodoDestino = grafo.obtenerNodo(filaDestino, columnaDestino);
 
                         hayRuta = pathfinder.buscarRutaBFS(
@@ -595,6 +633,9 @@ int main()
         mapa.clear(sf::Color::Black);
 
         dibujarmapa(mapa, map, suelo, pared, tanque1, tanque2, tamanoCelda);
+		dibujartank(mapa, map, tank1, tanque1, tamanoCelda);
+        dibujartank(mapa, map,tank2, tanque2, tamanoCelda);
+
 
         if (hayRuta) {
             dibujarRuta(mapa, grafo, camino, tamanoCamino, tamanoCelda);
