@@ -432,7 +432,7 @@ public:
 
 
 class Tank {
-public :
+public:
     int fila;
     int columna;
     int tipo;
@@ -441,12 +441,11 @@ public :
         this->fila = fila;
         this->columna = columna;
         this->tipo = tipo;
-	}
-
+    }
 
     int getfila() {
         return fila;
-	}
+    }
 
     int getcolumna() {
         return columna;
@@ -454,15 +453,16 @@ public :
 
     int gettipo() {
         return tipo;
-	}
+    }
 
     void move(int nuevaFila, int nuevaColumna) {
         fila = nuevaFila;
         columna = nuevaColumna;
-	}
+    }
 
-
-
+    bool incell(int filaclick, int columnaclick) {
+        return fila == filaclick && columna == columnaclick;
+    }
 };
 
 void dibujarRuta(
@@ -538,7 +538,6 @@ void dibujarmapa(
 
 void dibujartank(
     sf::RenderWindow& ventana,
-    Mapa& map,
     Tank& tank,
     sf::Texture& texture,
     float tamanoCelda
@@ -565,8 +564,11 @@ int main()
     Mapa map;
     Grafo grafo;
     Pathfinder pathfinder;
-	Tank tank1(1, 1, 2);
-	Tank tank2(Mapa::fil - 2, Mapa::col - 2, 3);
+
+    Tank tank1(1, 1, 2);
+    Tank tank2(Mapa::fil - 2, Mapa::col - 2, 3);
+
+    Tank* tankselected = nullptr;
 
     int camino[Grafo::totalNodos];
     int tamanoCamino = 0;
@@ -612,19 +614,57 @@ int main()
                         filaDestino >= 0 &&
                         filaDestino < Mapa::fil &&
                         columnaDestino >= 0 &&
-                        columnaDestino < Mapa::col &&
-                        map.recorrible(map.m[filaDestino][columnaDestino])
+                        columnaDestino < Mapa::col
                         ) {
-                        int nodoInicio = grafo.obtenerNodo(tank1.getfila(), tank1.getcolumna());
-                        int nodoDestino = grafo.obtenerNodo(filaDestino, columnaDestino);
 
-                        hayRuta = pathfinder.buscarRutaBFS(
-                            grafo,
-                            nodoInicio,
-                            nodoDestino,
-                            camino,
-                            tamanoCamino
-                        );
+                        if (tankselected == nullptr) {
+
+                            if (tank1.incell(filaDestino, columnaDestino)) {
+                                tankselected = &tank1;
+                                hayRuta = false;
+                                tamanoCamino = 0;
+                            }
+                            else if (tank2.incell(filaDestino, columnaDestino)) {
+                                tankselected = &tank2;
+                                hayRuta = false;
+                                tamanoCamino = 0;
+                            }
+
+                        }
+                        else {
+
+                            if (map.recorrible(map.m[filaDestino][columnaDestino])) {
+
+                                int nodoInicio = grafo.obtenerNodo(
+                                    tankselected->getfila(),
+                                    tankselected->getcolumna()
+                                );
+
+                                int nodoDestino = grafo.obtenerNodo(
+                                    filaDestino,
+                                    columnaDestino
+                                );
+
+                                hayRuta = pathfinder.buscarRutaBFS(
+                                    grafo,
+                                    nodoInicio,
+                                    nodoDestino,
+                                    camino,
+                                    tamanoCamino
+                                );
+
+                                if (hayRuta && tamanoCamino > 0) {
+                                    int nodoFinal = camino[tamanoCamino - 1];
+
+                                    int nuevaFila = grafo.obtenerFila(nodoFinal);
+                                    int nuevaColumna = grafo.obtenerColumna(nodoFinal);
+
+                                    tankselected->move(nuevaFila, nuevaColumna);
+                                }
+
+                                tankselected = nullptr;
+                            }
+                        }
                     }
                 }
             }
@@ -633,13 +673,13 @@ int main()
         mapa.clear(sf::Color::Black);
 
         dibujarmapa(mapa, map, suelo, pared, tanque1, tanque2, tamanoCelda);
-		dibujartank(mapa, map, tank1, tanque1, tamanoCelda);
-        dibujartank(mapa, map,tank2, tanque2, tamanoCelda);
-
 
         if (hayRuta) {
             dibujarRuta(mapa, grafo, camino, tamanoCamino, tamanoCelda);
         }
+
+        dibujartank(mapa, tank1, tanque1, tamanoCelda);
+        dibujartank(mapa, tank2, tanque2, tamanoCelda);
 
         mapa.display();
     }
