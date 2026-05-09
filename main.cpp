@@ -299,17 +299,14 @@ public:
     }
 
     bool buscarRutaBFS(
-        Mapa& map,
         Grafo& grafo,
-        int valorInicio,
-        int valorDestino,
+        int nodoInicio,
+        int nodoDestino,
         int camino[],
         int& tamanoCamino
     ) {
-        int inicio = buscarNodoValor(map, grafo, valorInicio);
-        int destino = buscarNodoValor(map, grafo, valorDestino);
-
-        if (inicio == -1 || destino == -1) {
+        if (nodoInicio == -1 || nodoDestino == -1) {
+            tamanoCamino = 0;
             return false;
         }
 
@@ -322,14 +319,14 @@ public:
 
         ColaEnteros cola;
 
-        cola.enqueue(inicio);
-        visitado[inicio] = true;
+        cola.enqueue(nodoInicio);
+        visitado[nodoInicio] = true;
 
         while (!cola.empty()) {
             int actual = cola.getFront();
             cola.dequeue();
 
-            if (actual == destino) {
+            if (actual == nodoDestino) {
                 break;
             }
 
@@ -345,14 +342,15 @@ public:
             }
         }
 
-        if (!visitado[destino]) {
+        if (!visitado[nodoDestino]) {
+            tamanoCamino = 0;
             return false;
         }
 
         int caminoInvertido[Grafo::totalNodos];
         int cantidad = 0;
 
-        int nodoActual = destino;
+        int nodoActual = nodoDestino;
 
         while (nodoActual != -1) {
             caminoInvertido[cantidad] = nodoActual;
@@ -434,6 +432,8 @@ public:
     }
 };
 
+
+
 void dibujarRuta(
     sf::RenderWindow& ventana,
     Grafo& grafo,
@@ -511,12 +511,28 @@ void dibujarmapa(
     }
 }
 
+
+int mousepositionX(sf::RenderWindow& ventana, int tamanoCelda) {
+        int x = sf::Mouse::getPosition(ventana).x;
+		return x / tamanoCelda;
+}
+
+int mousepositionY(sf::RenderWindow& ventana, int tamanoCelda) {
+        int y = sf::Mouse::getPosition(ventana).y;
+		return y / tamanoCelda ;;
+}
+
+
 int main()
 {
     RandomGenerator random;
     Mapa map;
     Grafo grafo;
     Pathfinder pathfinder;
+
+    int camino[Grafo::totalNodos];
+    int tamanoCamino = 0;
+    bool hayRuta = false;
 
     do {
         map.generarmaparandom(random);
@@ -525,19 +541,6 @@ int main()
     grafo.generarMatrizadyacencia(map);
 
     std::cout << map.m[1][1] << std::endl;
-
-
-    int camino[Grafo::totalNodos];
-    int tamanoCamino = 0;
-
-    bool hayRuta = pathfinder.buscarRutaBFS(
-        map,
-        grafo,
-        2,
-        3,
-        camino,
-        tamanoCamino
-    );
 
     sf::RenderWindow mapa(
         sf::VideoMode({ 800u, 600u }),
@@ -553,9 +556,39 @@ int main()
     const float tamanoCelda = 40.f;
 
     while (mapa.isOpen()) {
+
         while (const std::optional event = mapa.pollEvent()) {
+
             if (event->is<sf::Event::Closed>()) {
                 mapa.close();
+            }
+
+            if (const auto* mouseButton = event->getIf<sf::Event::MouseButtonPressed>()) {
+
+                if (mouseButton->button == sf::Mouse::Button::Left) {
+
+                    int columnaDestino = mouseButton->position.x / tamanoCelda;
+                    int filaDestino = mouseButton->position.y / tamanoCelda;
+
+                    if (
+                        filaDestino >= 0 &&
+                        filaDestino < Mapa::fil &&
+                        columnaDestino >= 0 &&
+                        columnaDestino < Mapa::col &&
+                        map.recorrible(map.m[filaDestino][columnaDestino])
+                        ) {
+                        int nodoInicio = pathfinder.buscarNodoValor(map, grafo, 2);
+                        int nodoDestino = grafo.obtenerNodo(filaDestino, columnaDestino);
+
+                        hayRuta = pathfinder.buscarRutaBFS(
+                            grafo,
+                            nodoInicio,
+                            nodoDestino,
+                            camino,
+                            tamanoCamino
+                        );
+                    }
+                }
             }
         }
 
@@ -566,7 +599,6 @@ int main()
         if (hayRuta) {
             dibujarRuta(mapa, grafo, camino, tamanoCamino, tamanoCelda);
         }
-
 
         mapa.display();
     }
