@@ -154,6 +154,9 @@ public:
 };
 
 
+
+
+
 class RandomGenerator {
 private:
     std::random_device rd;
@@ -184,7 +187,7 @@ public:
     }
 
     bool recorrible(int valor) {
-        return valor == 0 || valor == 2 || valor == 3;
+        return valor == 0;
     }
 
     void generarmaparandom(RandomGenerator& random) {
@@ -283,17 +286,6 @@ public:
 
 class Pathfinder {
 public:
-
-    int buscarNodoValor(Mapa& map, Grafo& grafo, int valorBuscado) {
-        for (int i = 0; i < Mapa::fil; i++) {
-            for (int j = 0; j < Mapa::col;j++) {
-                if(map.m[i][j] == valorBuscado){
-					return grafo.obtenerNodo(i, j);
-                }
-        }
-    }
-		return -1;
-    }
 
     bool buscarRutaBFS(
         Grafo& grafo,
@@ -436,11 +428,20 @@ public:
     int fila;
     int columna;
     int tipo;
+	int jugador;
+    int vida;
+    bool vivo;
+    sf::Color color;
 
-    Tank(int fila, int columna, int tipo) {
+    Tank(int fila, int columna, int tipo, int jugador, sf::Color color) {
         this->fila = fila;
         this->columna = columna;
         this->tipo = tipo;
+        this->jugador = jugador;
+        this->vida = 100;
+		this->vivo = true;
+        this->color = color;
+
     }
 
     int getfila() {
@@ -455,6 +456,19 @@ public:
         return tipo;
     }
 
+    int getvida() {
+        return vida;
+	}
+
+    bool estavivo() {
+        return vivo;
+	}
+
+    sf::Color getcolor() {
+        return color;
+	}
+
+
     void move(int nuevaFila, int nuevaColumna) {
         fila = nuevaFila;
         columna = nuevaColumna;
@@ -463,7 +477,43 @@ public:
     bool incell(int filaclick, int columnaclick) {
         return fila == filaclick && columna == columnaclick;
     }
+
+    void getdamage(int damage) {
+        vida -= damage;
+        if (vida <= 0) {
+            vida = 0;
+            vivo = false;
+        }
+	}
 };
+
+class TankFactory {
+public:
+    static Tank creartanqueazul(int fila, int columna) {
+        return Tank(fila, columna, 1, 1, sf::Color::Blue);
+    }
+
+    static Tank crearTanqueRojo(int fila, int columna) {
+        return Tank(fila, columna, 2, 1, sf::Color::Red);
+    }
+
+    static Tank crearTanqueCeleste(int fila, int columna) {
+        return Tank(fila, columna, 1, 2, sf::Color::Cyan);
+    }
+
+    static Tank crearTanqueAmarillo(int fila, int columna) {
+        return Tank(fila, columna, 2, 2, sf::Color::Yellow);
+    }
+};
+
+
+bool tankincell(Tank& tank1,
+    Tank& tank2,
+    int fila,
+    int columna
+) {
+    return tank1.incell(fila, columna) || tank2.incell(fila, columna);
+}
 
 void dibujarRuta(
     sf::RenderWindow& ventana,
@@ -519,8 +569,6 @@ void dibujarmapa(
     Mapa& map,
     sf::Texture& suelo,
     sf::Texture& pared,
-    sf::Texture& tanque1,
-    sf::Texture& tanque2,
     float tamanoCelda
 ) {
     for (int i = 0; i < Mapa::fil; i++) {
@@ -539,23 +587,125 @@ void dibujarmapa(
 void dibujartank(
     sf::RenderWindow& ventana,
     Tank& tank,
-    sf::Texture& texture,
     float tamanoCelda
 ) {
-	dibujarcelda(ventana, texture, tank.getfila(), tank.getcolumna(), tamanoCelda);
+    if (!tank.estavivo()) {
+        return;
+    }
+
+	float x = tank.getcolumna() * tamanoCelda;
+	float y = tank.getfila() * tamanoCelda;
+
+    sf::RectangleShape cuerpo;
+    cuerpo.setSize({ tamanoCelda * 0.8f, tamanoCelda * 0.8f });
+    cuerpo.setPosition({ x + tamanoCelda * 0.1f, y + tamanoCelda * 0.1f });
+    cuerpo.setFillColor(tank.getcolor());
+
+    sf::RectangleShape canon;
+    canon.setSize({ tamanoCelda * 0.15f, tamanoCelda * 0.45f });
+    canon.setPosition({ x + tamanoCelda * 0.425f, y });
+    canon.setFillColor(sf::Color::Black);
+
+    ventana.draw(cuerpo);
+    ventana.draw(canon);
 
 }
 
+class NodoTank {
+public:
+    Tank tank;
+    NodoTank* next;
 
-int mousepositionX(sf::RenderWindow& ventana, int tamanoCelda) {
-        int x = sf::Mouse::getPosition(ventana).x;
-		return x / tamanoCelda;
-}
+    NodoTank(Tank tank) : tank(tank) {
+        next = nullptr;
+    }
+};
 
-int mousepositionY(sf::RenderWindow& ventana, int tamanoCelda) {
-        int y = sf::Mouse::getPosition(ventana).y;
-		return y / tamanoCelda ;;
-}
+
+class listaTank {
+private:
+    NodoTank* head;
+
+public:
+    listaTank() {
+        head = nullptr;
+    }
+
+    ~listaTank() {
+        while (head != nullptr) {
+            NodoTank* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+
+    void agregar(Tank tank) {
+        NodoTank* nuevo = new NodoTank(tank);
+
+
+        if (head == nullptr) {
+            head = nuevo;
+        }
+
+        else {
+            NodoTank* actual = head;
+
+            while (actual->next != nullptr) {
+                actual = actual->next;
+            }
+
+            actual->next = nuevo;
+
+        }
+    }
+
+    Tank* buscarTanqueEnCelda(int fila, int columna) {
+        NodoTank* actual = head;
+
+        while (actual != nullptr) {
+            if (
+                actual->tank.estavivo() &&
+                actual->tank.incell(fila, columna)
+                ) {
+                return &(actual->tank);
+            }
+
+            actual = actual->next;
+        }
+
+        return nullptr;
+    }
+
+
+    bool celdaOcupada(int fila, int columna) {
+        NodoTank* actual = head;
+
+        while (actual != nullptr) {
+            if (
+                actual->tank.estavivo() &&
+                actual->tank.incell(fila, columna)
+                ) {
+                return true;
+            }
+
+            actual = actual->next;
+        }
+
+        return false;
+    }
+
+    void dibujarTodos(sf::RenderWindow& ventana, float tamanoCelda) {
+        NodoTank* actual = head;
+
+        while (actual != nullptr) {
+            dibujartank(ventana, actual->tank, tamanoCelda);
+            actual = actual->next;
+        }
+    }
+};
+
+
+
 
 
 int main()
@@ -565,8 +715,17 @@ int main()
     Grafo grafo;
     Pathfinder pathfinder;
 
-    Tank tank1(1, 1, 2);
-    Tank tank2(Mapa::fil - 2, Mapa::col - 2, 3);
+    listaTank tanques;
+
+    tanques.agregar(TankFactory::creartanqueazul(1, 1));
+    tanques.agregar(TankFactory::creartanqueazul(1, 2));
+    tanques.agregar(TankFactory::crearTanqueRojo(2, 1));
+    tanques.agregar(TankFactory::crearTanqueRojo(2, 2));
+
+    tanques.agregar(TankFactory::crearTanqueCeleste(13, 13));
+    tanques.agregar(TankFactory::crearTanqueCeleste(13, 12));
+    tanques.agregar(TankFactory::crearTanqueAmarillo(12, 13));
+    tanques.agregar(TankFactory::crearTanqueAmarillo(12, 12));
 
     Tank* tankselected = nullptr;
 
@@ -580,8 +739,6 @@ int main()
 
     grafo.generarMatrizadyacencia(map);
 
-    std::cout << map.m[1][1] << std::endl;
-
     sf::RenderWindow mapa(
         sf::VideoMode({ 800u, 600u }),
         "Mapa",
@@ -590,10 +747,11 @@ int main()
 
     sf::Texture suelo("suelo.png");
     sf::Texture pared("pared.png");
-    sf::Texture tanque1("tanque1.png");
-    sf::Texture tanque2("tanque2.png");
+ 
 
     const float tamanoCelda = 40.f;
+
+    tanques.dibujarTodos(mapa, tamanoCelda);
 
     while (mapa.isOpen()) {
 
@@ -619,21 +777,22 @@ int main()
 
                         if (tankselected == nullptr) {
 
-                            if (tank1.incell(filaDestino, columnaDestino)) {
-                                tankselected = &tank1;
-                                hayRuta = false;
-                                tamanoCamino = 0;
-                            }
-                            else if (tank2.incell(filaDestino, columnaDestino)) {
-                                tankselected = &tank2;
-                                hayRuta = false;
-                                tamanoCamino = 0;
+                            if (tankselected == nullptr) {
+                                tankselected = tanques.buscarTanqueEnCelda(filaDestino, columnaDestino);
+
+                                if (tankselected != nullptr) {
+                                    hayRuta = false;
+                                    tamanoCamino = 0;
+                                }
                             }
 
                         }
                         else {
 
-                            if (map.recorrible(map.m[filaDestino][columnaDestino])) {
+                            if (
+                                map.recorrible(map.m[filaDestino][columnaDestino]) &&
+                                !tanques.celdaOcupada(filaDestino, columnaDestino)
+                                ) {
 
                                 int nodoInicio = grafo.obtenerNodo(
                                     tankselected->getfila(),
@@ -672,14 +831,13 @@ int main()
 
         mapa.clear(sf::Color::Black);
 
-        dibujarmapa(mapa, map, suelo, pared, tanque1, tanque2, tamanoCelda);
+        dibujarmapa(mapa, map, suelo, pared, tamanoCelda);
 
         if (hayRuta) {
             dibujarRuta(mapa, grafo, camino, tamanoCamino, tamanoCelda);
         }
 
-        dibujartank(mapa, tank1, tanque1, tamanoCelda);
-        dibujartank(mapa, tank2, tanque2, tamanoCelda);
+        tanques.dibujarTodos(mapa, tamanoCelda);
 
         mapa.display();
     }
