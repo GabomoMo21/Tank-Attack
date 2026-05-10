@@ -2,6 +2,7 @@
 #include <optional>
 #include <iostream>
 #include <random>
+#include <cmath>
 
 class Nodocola {
 public:
@@ -205,7 +206,17 @@ public:
         for (int i = 1; i < fil - 1; i++) {
             for (int j = 1; j < col - 1; j++) {
 
-                if ((i == 1 && j == 1) || (i == fil - 2 && j == col - 2)) {
+                bool isSpawnCell =
+                    (i == 1 && j == 1) ||
+                    (i == 1 && j == 2) ||
+                    (i == 2 && j == 1) ||
+                    (i == 2 && j == 2) ||
+                    (i == fil - 2 && j == col - 2) ||
+                    (i == fil - 2 && j == col - 3) ||
+                    (i == fil - 3 && j == col - 2) ||
+                    (i == fil - 3 && j == col - 3);
+
+                if (isSpawnCell) {
                     continue;
                 }
 
@@ -705,6 +716,249 @@ public:
 };
 
 
+class Bullet {
+private:
+    float x;
+    float y;
+    float speed;
+
+    float dirX;
+    float dirY;
+
+    bool active;
+
+    int bounceCount;
+    int maxBounces;
+
+    Tank* owner;
+    bool canHitOwner;
+
+    float trailX[400];
+    float trailY[400];
+    int trailSize;
+
+public:
+    Bullet() {
+        x = 0.0f;
+        y = 0.0f;
+        speed = 350.0f;
+
+        dirX = 0.0f;
+        dirY = 0.0f;
+
+        active = false;
+
+        bounceCount = 0;
+        maxBounces = 3;
+
+        owner = nullptr;
+        canHitOwner = false;
+
+        trailSize = 0;
+
+        for (int i = 0; i < 400; i++) {
+            trailX[i] = 0.0f;
+            trailY[i] = 0.0f;
+        }
+    }
+
+    bool isActive() {
+        return active;
+    }
+
+    void clearTrail() {
+        trailSize = 0;
+
+        for (int i = 0; i < 400; i++) {
+            trailX[i] = 0.0f;
+            trailY[i] = 0.0f;
+        }
+    }
+
+    void addTrailPoint() {
+        if (trailSize < 400) {
+            trailX[trailSize] = x;
+            trailY[trailSize] = y;
+            trailSize++;
+        }
+    }
+
+    void shoot(Tank* shooter, int targetRow, int targetCol, float cellSize) {
+        if (shooter == nullptr) {
+            return;
+        }
+
+        owner = shooter;
+        active = true;
+
+        bounceCount = 0;
+        canHitOwner = false;
+
+        clearTrail();
+
+    
+        x = shooter->getcolumna() * cellSize + cellSize / 2.0f;
+        y = shooter->getfila() * cellSize + cellSize / 2.0f;
+
+    
+        float targetX = targetCol * cellSize + cellSize / 2.0f;
+        float targetY = targetRow * cellSize + cellSize / 2.0f;
+
+        float dx = targetX - x;
+        float dy = targetY - y;
+
+        float distance = std::sqrt(dx * dx + dy * dy);
+
+        if (distance > 0.0f) {
+            dirX = dx / distance;
+            dirY = dy / distance;
+        }
+        else {
+            dirX = 0.0f;
+            dirY = -1.0f;
+        }
+
+        addTrailPoint();
+    }
+
+    void update(float deltaTime, Mapa& map, listaTank& tanks, float cellSize) {
+        if (!active) {
+            return;
+        }
+
+        float nextX = x + dirX * speed * deltaTime;
+        float nextY = y + dirY * speed * deltaTime;
+
+        int currentRow = int(y / cellSize);
+        int currentCol = int(x / cellSize);
+
+        int nextRow = int(nextY / cellSize);
+        int nextCol = int(nextX / cellSize);
+
+    
+        if (
+            nextRow < 0 ||
+            nextRow >= Mapa::fil ||
+            nextCol < 0 ||
+            nextCol >= Mapa::col
+            ) {
+            active = false;
+            return;
+        }
+
+    
+        if (owner != nullptr) {
+            if (
+                currentRow != owner->getfila() ||
+                currentCol != owner->getcolumna()
+                ) {
+                canHitOwner = true;
+            }
+        }
+
+        bool hitWallX = false;
+        bool hitWallY = false;
+
+   
+        int checkCol = int(nextX / cellSize);
+
+        if (
+            currentRow >= 0 &&
+            currentRow < Mapa::fil &&
+            checkCol >= 0 &&
+            checkCol < Mapa::col
+            ) {
+            if (!map.recorrible(map.m[currentRow][checkCol])) {
+                hitWallX = true;
+            }
+        }
+
+        int checkRow = int(nextY / cellSize);
+
+        if (
+            checkRow >= 0 &&
+            checkRow < Mapa::fil &&
+            currentCol >= 0 &&
+            currentCol < Mapa::col
+            ) {
+            if (!map.recorrible(map.m[checkRow][currentCol])) {
+                hitWallY = true;
+            }
+        }
+
+
+        if (hitWallX || hitWallY) {
+            if (hitWallX) {
+                dirX = -dirX;
+            }
+
+            if (hitWallY) {
+                dirY = -dirY;
+            }
+
+            bounceCount++;
+
+            if (bounceCount > maxBounces) {
+                active = false;
+            }
+
+            addTrailPoint();
+            return;
+        }
+
+        x = nextX;
+        y = nextY;
+
+        addTrailPoint();
+
+        int bulletRow = int(y / cellSize);
+        int bulletCol = int(x / cellSize);
+
+        Tank* hitTank = tanks.buscarTanqueEnCelda(bulletRow, bulletCol);
+
+        if (hitTank != nullptr) {
+            if (hitTank == owner && !canHitOwner) {
+                return;
+            }
+
+            int damage = 25;
+
+
+            if (owner != nullptr && owner->gettipo() == 2) {
+                damage = 50;
+            }
+
+            hitTank->getdamage(damage);
+
+            active = false;
+        }
+    }
+
+    void draw(sf::RenderWindow& window) {
+     
+        for (int i = 0; i < trailSize; i++) {
+            sf::CircleShape point;
+            point.setRadius(3.0f);
+            point.setOrigin({ 3.0f, 3.0f });
+            point.setPosition({ trailX[i], trailY[i] });
+            point.setFillColor(sf::Color(230, 230, 230));
+            window.draw(point);
+        }
+
+        if (!active) {
+            return;
+        }
+
+       
+        sf::CircleShape bulletShape;
+        bulletShape.setRadius(6.0f);
+        bulletShape.setOrigin({ 6.0f, 6.0f });
+        bulletShape.setPosition({ x, y });
+        bulletShape.setFillColor(sf::Color::White);
+
+        window.draw(bulletShape);
+    }
+};
 
 
 
@@ -714,7 +968,6 @@ int main()
     Mapa map;
     Grafo grafo;
     Pathfinder pathfinder;
-
     listaTank tanques;
 
     tanques.agregar(TankFactory::creartanqueazul(1, 1));
@@ -732,6 +985,7 @@ int main()
     int camino[Grafo::totalNodos];
     int tamanoCamino = 0;
     bool hayRuta = false;
+    Bullet bullet;    
 
     do {
         map.generarmaparandom(random);
@@ -744,6 +998,7 @@ int main()
         "Mapa",
         sf::Style::Resize
     );
+    sf::Clock gameClock;
 
     sf::Texture suelo("suelo.png");
     sf::Texture pared("pared.png");
@@ -751,10 +1006,8 @@ int main()
 
     const float tamanoCelda = 40.f;
 
-    tanques.dibujarTodos(mapa, tamanoCelda);
-
     while (mapa.isOpen()) {
-
+        float deltaTime = gameClock.restart().asSeconds();
         while (const std::optional event = mapa.pollEvent()) {
 
             if (event->is<sf::Event::Closed>()) {
@@ -765,8 +1018,8 @@ int main()
 
                 if (mouseButton->button == sf::Mouse::Button::Left) {
 
-                    int columnaDestino = mouseButton->position.x / tamanoCelda;
-                    int filaDestino = mouseButton->position.y / tamanoCelda;
+                    int columnaDestino = int(mouseButton->position.x / tamanoCelda);
+                    int filaDestino = int(mouseButton->position.y / tamanoCelda);
 
                     if (
                         filaDestino >= 0 &&
@@ -826,8 +1079,32 @@ int main()
                         }
                     }
                 }
+                if (mouseButton->button == sf::Mouse::Button::Right) {
+                    int targetCol = int(mouseButton->position.x / tamanoCelda);
+                    int targetRow = int(mouseButton->position.y / tamanoCelda);
+
+                    if (
+                        targetRow >= 0 &&
+                        targetRow < Mapa::fil &&
+                        targetCol >= 0 &&
+                        targetCol < Mapa::col
+                        ) {
+                        if (tankselected != nullptr) {
+                            bullet.shoot(
+                                tankselected,
+                                targetRow,
+                                targetCol,
+                                tamanoCelda
+                            );
+
+                            hayRuta = false;
+                            tankselected = nullptr;
+                        }
+                    }
+                }
             }
         }
+        bullet.update(deltaTime, map, tanques, tamanoCelda);
 
         mapa.clear(sf::Color::Black);
 
@@ -838,7 +1115,7 @@ int main()
         }
 
         tanques.dibujarTodos(mapa, tamanoCelda);
-
+        bullet.draw(mapa);
         mapa.display();
     }
 
