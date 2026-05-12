@@ -19,6 +19,7 @@ public:
     int gettipo();
     int getvida();
     bool estavivo();
+	int getplayer();
 
     sf::Color getcolor();
 

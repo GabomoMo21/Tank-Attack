@@ -51,3 +51,7 @@ void Tank::getdamage(int damage) {
         vivo = false;
     }
 }
+
+int Tank::getplayer() {
+    return jugador;
+}

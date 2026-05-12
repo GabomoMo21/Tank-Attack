@@ -11,6 +11,9 @@
 #include "TankList.h"
 #include "Bullet.h"
 #include "DrawUtils.h"
+#include "TurnManager.h"
+#include <string>
+
 
 int main()
 {
@@ -19,6 +22,7 @@ int main()
     Grafo grafo;
     Pathfinder pathfinder;
     listaTank tanques;
+	TurnManager turnManager;
 
     tanques.agregar(TankFactory::creartanqueazul(1, 1));
     tanques.agregar(TankFactory::creartanqueazul(1, 2));
@@ -84,6 +88,7 @@ int main()
                         columnaDestino >= 0 &&
                         columnaDestino < Mapa::col
                         ) {
+
                         if (tankselected == nullptr) {
                             tankselected = tanques.buscarTanqueEnCelda(
                                 filaDestino,
@@ -91,8 +96,13 @@ int main()
                             );
 
                             if (tankselected != nullptr) {
-                                hayRuta = false;
-                                tamanoCamino = 0;
+                                if(turnManager.isPlayerTurn(tankselected->getplayer())){
+                                    hayRuta = false;
+                                    tamanoCamino = 0;
+                                }
+                                else {
+									tankselected = nullptr;
+                                }
                             }
                         }
                         else {
@@ -125,6 +135,8 @@ int main()
                                     int nuevaColumna = grafo.obtenerColumna(nodoFinal);
 
                                     tankselected->move(nuevaFila, nuevaColumna);
+
+									turnManager.nextTurn();
                                 }
 
                                 tankselected = nullptr;
@@ -153,6 +165,8 @@ int main()
 
                             hayRuta = false;
                             tankselected = nullptr;
+
+							turnManager.nextTurn();
                         }
                     }
                 }
@@ -161,6 +175,9 @@ int main()
 
         // This moves the bullet every frame
         bullet.update(deltaTime, map, tanques, tamanoCelda);
+
+        std::string titulo = "Mapa - Turno jugador " + std::to_string(turnManager.getActualPlayer());
+        mapa.setTitle(titulo);
 
         mapa.clear(sf::Color::Black);
 
