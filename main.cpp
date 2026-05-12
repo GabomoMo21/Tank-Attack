@@ -13,6 +13,8 @@
 #include "DrawUtils.h"
 #include "TurnManager.h"
 #include <string>
+#include "GameTimer.h"
+#include <string>
 
 
 int main()
@@ -23,6 +25,7 @@ int main()
     Pathfinder pathfinder;
     listaTank tanques;
 	TurnManager turnManager;
+	GameTimer gameTimer(300.0f);
 
     tanques.agregar(TankFactory::creartanqueazul(1, 1));
     tanques.agregar(TankFactory::creartanqueazul(1, 2));
@@ -71,6 +74,10 @@ int main()
 
     while (mapa.isOpen()) {
         float deltaTime = gameClock.restart().asSeconds();
+
+        if (gameTimer.TimeUp()) {
+			mapa.close();
+        }
 
         while (const std::optional event = mapa.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
@@ -176,7 +183,19 @@ int main()
         // This moves the bullet every frame
         bullet.update(deltaTime, map, tanques, tamanoCelda);
 
-        std::string titulo = "Mapa - Turno jugador " + std::to_string(turnManager.getActualPlayer());
+        std::string titulo =
+            "Tank Attack - Jugador " +
+            std::to_string(turnManager.getActualPlayer()) +
+            " | Tiempo: " +
+            std::to_string(gameTimer.getMinutes()) +
+            ":";
+
+        if (gameTimer.getSeconds() < 10) {
+            titulo += "0";
+        }
+
+        titulo += std::to_string(gameTimer.getSeconds());
+
         mapa.setTitle(titulo);
 
         mapa.clear(sf::Color::Black);
@@ -192,7 +211,7 @@ int main()
         bullet.draw(mapa);
 
         mapa.display();
-    }
+}
 
     return 0;
 }   
