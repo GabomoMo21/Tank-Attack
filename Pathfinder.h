@@ -19,6 +19,14 @@ public:
         int camino[],
         int& tamanoCamino
     );
-
+    bool buscarRutaRandom(
+        Grafo& grafo,
+        Mapa& map,
+        int nodoInicio,
+        int camino[],
+        int& tamanoCamino,
+        int radio,
+        RandomGenerator& random
+    );
     bool validacionBFS(Mapa& map);
 };

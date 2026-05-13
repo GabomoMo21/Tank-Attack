@@ -156,7 +156,52 @@ bool Pathfinder::buscarRutaDijkstra(
     return true;
 }
 
+bool Pathfinder::buscarRutaRandom(
+    Grafo& grafo,
+    Mapa& map,
+    int nodoInicio,
+    int camino[],
+    int& tamanoCamino,
+    int radio,
+    RandomGenerator& random
+) {
+    if (nodoInicio == -1) {
+        tamanoCamino = 0;
+        return false;
+    }
 
+    int startRow = grafo.obtenerFila(nodoInicio);
+    int startCol = grafo.obtenerColumna(nodoInicio);
+
+    int tries = 20;
+
+    for (int i = 0; i < tries; i++) {
+        int randomRow = startRow + random.randomEntero(-radio, radio);
+        int randomCol = startCol + random.randomEntero(-radio, radio);
+
+        if (
+            randomRow >= 0 &&
+            randomRow < Mapa::fil &&
+            randomCol >= 0 &&
+            randomCol < Mapa::col &&
+            map.recorrible(map.m[randomRow][randomCol])
+            ) {
+            int nodoDestino = grafo.obtenerNodo(randomRow, randomCol);
+
+            // This uses BFS to make a valid route to the random cell
+            return buscarRutaBFS(
+                grafo,
+                nodoInicio,
+                nodoDestino,
+                camino,
+                tamanoCamino
+            );
+        }
+    }
+
+    tamanoCamino = 0;
+    return false;
+}
 
 bool Pathfinder::validacionBFS(Mapa& map) {
     bool visitado[Mapa::fil][Mapa::col] = {};

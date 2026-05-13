@@ -152,25 +152,55 @@ int main()
                                     columnaDestino
                                 );
 
+                                int chance = random.randomEntero(1, 100);
+
                                 if (tankselected->gettipo() == 1) {
-                                    // Blue and cyan tanks use BFS
-                                    hayRuta = pathfinder.buscarRutaBFS(
-                                        grafo,
-                                        nodoInicio,
-                                        nodoDestino,
-                                        camino,
-                                        tamanoCamino
-                                    );
+                                    if (chance <= 50) {
+                                        // Blue and cyan tanks use BFS with 50 percent
+                                        hayRuta = pathfinder.buscarRutaBFS(
+                                            grafo,
+                                            nodoInicio,
+                                            nodoDestino,
+                                            camino,
+                                            tamanoCamino
+                                        );
+                                    }
+                                    else {
+                                        // Blue and cyan tanks use random movement with 50 percent
+                                        hayRuta = pathfinder.buscarRutaRandom(
+                                            grafo,
+                                            map,
+                                            nodoInicio,
+                                            camino,
+                                            tamanoCamino,
+                                            4,
+                                            random
+                                        );
+                                    }
                                 }
                                 else {
-                                    // Red and yellow tanks use Dijkstra
-                                    hayRuta = pathfinder.buscarRutaDijkstra(
-                                        grafo,
-                                        nodoInicio,
-                                        nodoDestino,
-                                        camino,
-                                        tamanoCamino
-                                    );
+                                    if (chance <= 80) {
+                                        // Red and yellow tanks use Dijkstra with 80 percent
+                                        hayRuta = pathfinder.buscarRutaDijkstra(
+                                            grafo,
+                                            nodoInicio,
+                                            nodoDestino,
+                                            camino,
+                                            tamanoCamino
+                                        );
+                                    }
+                                    else {
+                                        // Red and yellow tanks use random movement with 20 percent
+                                        hayRuta = pathfinder.buscarRutaRandom(
+                                            grafo,
+                                            map,
+                                            nodoInicio,
+                                            camino,
+                                            tamanoCamino,
+                                            4,
+                                            random
+                                        );
+                                    }
                                 }
 
                                 if (hayRuta && tamanoCamino > 0) {
