@@ -152,13 +152,26 @@ int main()
                                     columnaDestino
                                 );
 
-                                hayRuta = pathfinder.buscarRutaBFS(
-                                    grafo,
-                                    nodoInicio,
-                                    nodoDestino,
-                                    camino,
-                                    tamanoCamino
-                                );
+                                if (tankselected->gettipo() == 1) {
+                                    // Blue and cyan tanks use BFS
+                                    hayRuta = pathfinder.buscarRutaBFS(
+                                        grafo,
+                                        nodoInicio,
+                                        nodoDestino,
+                                        camino,
+                                        tamanoCamino
+                                    );
+                                }
+                                else {
+                                    // Red and yellow tanks use Dijkstra
+                                    hayRuta = pathfinder.buscarRutaDijkstra(
+                                        grafo,
+                                        nodoInicio,
+                                        nodoDestino,
+                                        camino,
+                                        tamanoCamino
+                                    );
+                                }
 
                                 if (hayRuta && tamanoCamino > 0) {
                                     int nodoFinal = camino[tamanoCamino - 1];

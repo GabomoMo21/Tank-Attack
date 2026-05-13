@@ -70,6 +70,93 @@ bool Pathfinder::buscarRutaBFS(
 
     return true;
 }
+bool Pathfinder::buscarRutaDijkstra(
+    Grafo& grafo,
+    int nodoInicio,
+    int nodoDestino,
+    int camino[],
+    int& tamanoCamino
+) {
+    if (nodoInicio == -1 || nodoDestino == -1) {
+        tamanoCamino = 0;
+        return false;
+    }
+
+    int distancia[Grafo::totalNodos];
+    bool visitado[Grafo::totalNodos];
+    int anterior[Grafo::totalNodos];
+
+    for (int i = 0; i < Grafo::totalNodos; i++) {
+        distancia[i] = 999999;
+        visitado[i] = false;
+        anterior[i] = -1;
+    }
+
+    distancia[nodoInicio] = 0;
+
+    for (int i = 0; i < Grafo::totalNodos; i++) {
+        int actual = -1;
+        int mejorDistancia = 999999;
+
+        // This finds the free node with less distance
+        for (int j = 0; j < Grafo::totalNodos; j++) {
+            if (!visitado[j] && distancia[j] < mejorDistancia) {
+                mejorDistancia = distancia[j];
+                actual = j;
+            }
+        }
+
+        if (actual == -1) {
+            break;
+        }
+
+        if (actual == nodoDestino) {
+            break;
+        }
+
+        visitado[actual] = true;
+
+        // This checks all neighbors
+        for (int vecino = 0; vecino < Grafo::totalNodos; vecino++) {
+            if (grafo.adyacencia[actual][vecino] > 0 && !visitado[vecino]) {
+                int peso = grafo.adyacencia[actual][vecino];
+                int nuevaDistancia = distancia[actual] + peso;
+
+                if (nuevaDistancia < distancia[vecino]) {
+                    distancia[vecino] = nuevaDistancia;
+                    anterior[vecino] = actual;
+                }
+            }
+        }
+    }
+
+    if (distancia[nodoDestino] == 999999) {
+        tamanoCamino = 0;
+        return false;
+    }
+
+    int caminoInvertido[Grafo::totalNodos];
+    int cantidad = 0;
+
+    int nodoActual = nodoDestino;
+
+    while (nodoActual != -1) {
+        caminoInvertido[cantidad] = nodoActual;
+        cantidad++;
+
+        nodoActual = anterior[nodoActual];
+    }
+
+    tamanoCamino = cantidad;
+
+    for (int i = 0; i < cantidad; i++) {
+        camino[i] = caminoInvertido[cantidad - 1 - i];
+    }
+
+    return true;
+}
+
+
 
 bool Pathfinder::validacionBFS(Mapa& map) {
     bool visitado[Mapa::fil][Mapa::col] = {};

@@ -87,10 +87,10 @@
       <Filter>Archivos de recursos</Filter>
     </ClInclude>
     <ClInclude Include="GameTimer.h">
-      <Filter>Archivos de encabezado</Filter>
+      <Filter>Archivos de recursos</Filter>
     </ClInclude>
     <ClInclude Include="TurnManager.h">
-      <Filter>Archivos de encabezado</Filter>
+      <Filter>Archivos de recursos</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
