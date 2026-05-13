@@ -92,4 +92,20 @@ void dibujartank(
 
     ventana.draw(cuerpo);
     ventana.draw(canon);
+    // This draws the life bar background
+    sf::RectangleShape lifeBack;
+    lifeBack.setSize({ tamanoCelda * 0.8f, 5.0f });
+    lifeBack.setPosition({ x + tamanoCelda * 0.1f, y - 7.0f });
+    lifeBack.setFillColor(sf::Color::Red);
+
+    // This draws the current life
+    float lifeWidth = (float(tank.getvida()) / 100.0f) * (tamanoCelda * 0.8f);
+
+    sf::RectangleShape lifeBar;
+    lifeBar.setSize({ lifeWidth, 5.0f });
+    lifeBar.setPosition({ x + tamanoCelda * 0.1f, y - 7.0f });
+    lifeBar.setFillColor(sf::Color::Green);
+
+    ventana.draw(lifeBack);
+    ventana.draw(lifeBar);
 }

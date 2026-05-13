@@ -75,8 +75,33 @@ int main()
     while (mapa.isOpen()) {
         float deltaTime = gameClock.restart().asSeconds();
 
+        int player1Alive = tanques.contarVivosJugador(1);
+        int player2Alive = tanques.contarVivosJugador(2);
+
+        if (player1Alive == 0) {
+            std::cout << "Player 2 wins\n";
+            mapa.close();
+        }
+
+        if (player2Alive == 0) {
+            std::cout << "Player 1 wins\n";
+            mapa.close();
+        }
+
         if (gameTimer.TimeUp()) {
-			mapa.close();
+            int winner = tanques.getWinnerByAliveTanks();
+
+            if (winner == 1) {
+                std::cout << "Player 1 wins by time\n";
+            }
+            else if (winner == 2) {
+                std::cout << "Player 2 wins by time\n";
+            }
+            else {
+                std::cout << "Draw\n";
+            }
+
+            mapa.close();
         }
 
         while (const std::optional event = mapa.pollEvent()) {
@@ -180,13 +205,14 @@ int main()
             }
         }
 
+        
         // This moves the bullet every frame
         bullet.update(deltaTime, map, tanques, tamanoCelda);
 
         std::string titulo =
-            "Tank Attack - Jugador " +
+            "Tank Attack - Player " +
             std::to_string(turnManager.getActualPlayer()) +
-            " | Tiempo: " +
+            " | Time: " +
             std::to_string(gameTimer.getMinutes()) +
             ":";
 
@@ -195,6 +221,12 @@ int main()
         }
 
         titulo += std::to_string(gameTimer.getSeconds());
+
+        titulo +=
+            " | P1 tanks: " +
+            std::to_string(player1Alive) +
+            " | P2 tanks: " +
+            std::to_string(player2Alive);
 
         mapa.setTitle(titulo);
 

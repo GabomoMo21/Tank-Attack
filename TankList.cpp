@@ -67,7 +67,39 @@ bool listaTank::celdaOcupada(int fila, int columna) {
 
     return false;
 }
+int listaTank::contarVivosJugador(int jugador) {
+    int count = 0;
 
+    NodoTank* actual = head;
+
+    while (actual != nullptr) {
+        if (
+            actual->tank.estavivo() &&
+            actual->tank.getplayer() == jugador
+            ) {
+            count++;
+        }
+
+        actual = actual->next;
+    }
+
+    return count;
+}
+
+int listaTank::getWinnerByAliveTanks() {
+    int player1Tanks = contarVivosJugador(1);
+    int player2Tanks = contarVivosJugador(2);
+
+    if (player1Tanks > player2Tanks) {
+        return 1;
+    }
+
+    if (player2Tanks > player1Tanks) {
+        return 2;
+    }
+
+    return 0;
+}
 void listaTank::dibujarTodos(sf::RenderWindow& ventana, float tamanoCelda) {
     NodoTank* actual = head;
 

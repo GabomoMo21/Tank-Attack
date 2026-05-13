@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="DrawUtils.cpp" />
+    <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Queue.cpp" />
     <ClCompile Include="RandomGenerator.cpp" />
@@ -162,10 +163,12 @@
     <ClCompile Include="Tank.cpp" />
     <ClCompile Include="TankFactory.cpp" />
     <ClCompile Include="TankList.cpp" />
+    <ClCompile Include="TurnManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="DrawUtils.h" />
+    <ClInclude Include="GameTimer.h" />
     <ClInclude Include="Grafo.h" />
     <ClInclude Include="Pathfinder.h" />
     <ClInclude Include="Mapa.h" />
@@ -174,6 +177,7 @@
     <ClInclude Include="Tank.h" />
     <ClInclude Include="TankFactory.h" />
     <ClInclude Include="TankList.h" />
+    <ClInclude Include="TurnManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

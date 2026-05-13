@@ -25,5 +25,9 @@ public:
 
     bool celdaOcupada(int fila, int columna);
 
+    int contarVivosJugador(int jugador);
+
+    int getWinnerByAliveTanks();
+
     void dibujarTodos(sf::RenderWindow& ventana, float tamanoCelda);
 };
