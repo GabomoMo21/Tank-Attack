@@ -1,8 +1,12 @@
 #include "Pathfinder.h"
 #include "Queue.h"
+#include "TankList.h"
+#include "Tank.h"
 
 bool Pathfinder::buscarRutaBFS(
     Grafo& grafo,
+	listaTank& tanques,
+	Tank* tanqueActual,
     int nodoInicio,
     int nodoDestino,
     int camino[],
@@ -38,9 +42,14 @@ bool Pathfinder::buscarRutaBFS(
                 grafo.adyacencia[actual][vecino] == 1 &&
                 !visitado[vecino]
                 ) {
-                visitado[vecino] = true;
-                anterior[vecino] = actual;
-                cola.enqueue(vecino);
+                int filaVecino = grafo.obtenerFila(vecino);
+                int columnaVecino = grafo.obtenerColumna(vecino);
+
+                if (!tanques.cellOccupiedExcept(filaVecino, columnaVecino, tanqueActual)) {
+                    visitado[vecino] = true;
+                    anterior[vecino] = actual;
+                    cola.enqueue(vecino);
+                }
             }
         }
     }
@@ -72,6 +81,8 @@ bool Pathfinder::buscarRutaBFS(
 }
 bool Pathfinder::buscarRutaDijkstra(
     Grafo& grafo,
+	listaTank& tanques,
+	Tank* tanqueActual,
     int nodoInicio,
     int nodoDestino,
     int camino[],
@@ -119,12 +130,18 @@ bool Pathfinder::buscarRutaDijkstra(
         // This checks all neighbors
         for (int vecino = 0; vecino < Grafo::totalNodos; vecino++) {
             if (grafo.adyacencia[actual][vecino] > 0 && !visitado[vecino]) {
-                int peso = grafo.adyacencia[actual][vecino];
-                int nuevaDistancia = distancia[actual] + peso;
 
-                if (nuevaDistancia < distancia[vecino]) {
-                    distancia[vecino] = nuevaDistancia;
-                    anterior[vecino] = actual;
+                int filaVecino = grafo.obtenerFila(vecino);
+                int columnaVecino = grafo.obtenerColumna(vecino);
+
+                if (!tanques.cellOccupiedExcept(filaVecino, columnaVecino, tanqueActual)) {
+                    int peso = grafo.adyacencia[actual][vecino];
+                    int nuevaDistancia = distancia[actual] + peso;
+
+                    if (nuevaDistancia < distancia[vecino]) {
+                        distancia[vecino] = nuevaDistancia;
+                        anterior[vecino] = actual;
+                    }
                 }
             }
         }
@@ -159,6 +176,8 @@ bool Pathfinder::buscarRutaDijkstra(
 bool Pathfinder::buscarRutaRandom(
     Grafo& grafo,
     Mapa& map,
+    listaTank& tanques,
+    Tank* tanqueActual,
     int nodoInicio,
     int camino[],
     int& tamanoCamino,
@@ -184,13 +203,16 @@ bool Pathfinder::buscarRutaRandom(
             randomRow < Mapa::fil &&
             randomCol >= 0 &&
             randomCol < Mapa::col &&
-            map.recorrible(map.m[randomRow][randomCol])
+            map.recorrible(map.m[randomRow][randomCol]) &&
+			!tanques.cellOccupiedExcept(randomRow, randomCol, tanqueActual)
             ) {
             int nodoDestino = grafo.obtenerNodo(randomRow, randomCol);
 
             // This uses BFS to make a valid route to the random cell
             return buscarRutaBFS(
                 grafo,
+                tanques,
+                tanqueActual,
                 nodoInicio,
                 nodoDestino,
                 camino,

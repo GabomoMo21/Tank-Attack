@@ -108,3 +108,21 @@ void listaTank::dibujarTodos(sf::RenderWindow& ventana, float tamanoCelda) {
         actual = actual->next;
     }
 }
+
+bool listaTank::cellOccupiedExcept(int fila, int columna, Tank* tanqueignorado) {
+    NodoTank* actual = head;
+
+    while (actual != nullptr) {
+        if (
+            actual->tank.estavivo() &&
+            actual->tank.incell(fila, columna) &&
+            &(actual->tank) != tanqueignorado
+            ) {
+            return true;
+        }
+
+        actual = actual->next;
+    }
+
+    return false;
+}

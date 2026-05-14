@@ -192,7 +192,7 @@ void Bullet::update(float deltaTime, Mapa& map, listaTank& tanks, float cellSize
 
         int damage = 25;
 
-        if (owner != nullptr && owner->gettipo() == 2) {
+        if (hitTank->gettipo() == 2) {
             damage = 50;
         }
 

@@ -26,4 +26,5 @@ public:
     void move(int nuevaFila, int nuevaColumna);
     bool incell(int filaclick, int columnaclick);
     void getdamage(int damage);
+
 };

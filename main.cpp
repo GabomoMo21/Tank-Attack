@@ -159,6 +159,8 @@ int main()
                                         // Blue and cyan tanks use BFS with 50 percent
                                         hayRuta = pathfinder.buscarRutaBFS(
                                             grafo,
+                                            tanques,
+											tankselected,
                                             nodoInicio,
                                             nodoDestino,
                                             camino,
@@ -170,6 +172,8 @@ int main()
                                         hayRuta = pathfinder.buscarRutaRandom(
                                             grafo,
                                             map,
+                                            tanques,
+                                            tankselected,
                                             nodoInicio,
                                             camino,
                                             tamanoCamino,
@@ -183,6 +187,8 @@ int main()
                                         // Red and yellow tanks use Dijkstra with 80 percent
                                         hayRuta = pathfinder.buscarRutaDijkstra(
                                             grafo,
+                                            tanques,
+                                            tankselected,
                                             nodoInicio,
                                             nodoDestino,
                                             camino,
@@ -194,6 +200,8 @@ int main()
                                         hayRuta = pathfinder.buscarRutaRandom(
                                             grafo,
                                             map,
+                                            tanques,
+                                            tankselected,
                                             nodoInicio,
                                             camino,
                                             tamanoCamino,

@@ -3,10 +3,15 @@
 #include "Mapa.h"
 #include "Grafo.h"
 
+class listaTank;
+class Tank;
+
 class Pathfinder {
 public:
     bool buscarRutaBFS(
         Grafo& grafo,
+        listaTank& tanques,
+		Tank* tanqueActual,
         int nodoInicio,
         int nodoDestino,
         int camino[],
@@ -14,6 +19,8 @@ public:
     );
     bool buscarRutaDijkstra(
         Grafo& grafo,
+		listaTank& tanques,
+		Tank* tanqueActual,
         int nodoInicio,
         int nodoDestino,
         int camino[],
@@ -22,6 +29,8 @@ public:
     bool buscarRutaRandom(
         Grafo& grafo,
         Mapa& map,
+        listaTank& tanques,
+        Tank* tanqueActual,
         int nodoInicio,
         int camino[],
         int& tamanoCamino,

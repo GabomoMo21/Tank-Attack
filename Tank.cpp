@@ -55,3 +55,4 @@ void Tank::getdamage(int damage) {
 int Tank::getplayer() {
     return jugador;
 }
+

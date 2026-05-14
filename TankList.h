@@ -30,4 +30,6 @@ public:
     int getWinnerByAliveTanks();
 
     void dibujarTodos(sf::RenderWindow& ventana, float tamanoCelda);
+
+    bool cellOccupiedExcept(int fila, int columna, Tank* tanqueIgnorado);
 };
