@@ -126,129 +126,134 @@ int main()
             }
 
             if (const auto* mouseButton = event->getIf<sf::Event::MouseButtonPressed>()) {
-                if (mouseButton->button == sf::Mouse::Button::Left) {
-                    int columnaDestino = int((mouseButton->position.x - mapaOffsetX) / tamanoCelda);
-                    int filaDestino = int((mouseButton->position.y - mapaOffsetY) / tamanoCelda);
 
-                    bool clickDentroDelMapa =
-                        mouseButton->position.x >= mapaOffsetX &&
-                        mouseButton->position.x < mapaOffsetX + Mapa::col * tamanoCelda &&
-                        mouseButton->position.y >= mapaOffsetY &&
-                        mouseButton->position.y < mapaOffsetY + Mapa::fil * tamanoCelda;
+                if (!bullet.isActive()){
+                    if (mouseButton->button == sf::Mouse::Button::Left) {
+                        int columnaDestino = int((mouseButton->position.x - mapaOffsetX) / tamanoCelda);
+                        int filaDestino = int((mouseButton->position.y - mapaOffsetY) / tamanoCelda);
 
-                    if (!clickDentroDelMapa) {
-                        continue;
-                    }
+                        bool clickDentroDelMapa =
+                            mouseButton->position.x >= mapaOffsetX &&
+                            mouseButton->position.x < mapaOffsetX + Mapa::col * tamanoCelda &&
+                            mouseButton->position.y >= mapaOffsetY &&
+                            mouseButton->position.y < mapaOffsetY + Mapa::fil * tamanoCelda;
 
-                    if (
-                        filaDestino >= 0 &&
-                        filaDestino < Mapa::fil &&
-                        columnaDestino >= 0 &&
-                        columnaDestino < Mapa::col
-                        ) {
-
-                        if (tankselected == nullptr) {
-                            tankselected = tanques.buscarTanqueEnCelda(
-                                filaDestino,
-                                columnaDestino
-                            );
-
-                            if (tankselected != nullptr) {
-                                if(turnManager.isPlayerTurn(tankselected->getplayer())){
-                                    hayRuta = false;
-                                    tamanoCamino = 0;
-                                }
-                                else {
-									tankselected = nullptr;
-                                }
-                            }
+                        if (!clickDentroDelMapa) {
+                            continue;
                         }
-                        else {
-                            if (
-                                map.recorrible(map.m[filaDestino][columnaDestino]) &&
-                                !tanques.celdaOcupada(filaDestino, columnaDestino)
-                                ) {
-                                int nodoInicio = grafo.obtenerNodo(
-                                    tankselected->getfila(),
-                                    tankselected->getcolumna()
-                                );
 
-                                int nodoDestino = grafo.obtenerNodo(
+                        if (
+                            filaDestino >= 0 &&
+                            filaDestino < Mapa::fil &&
+                            columnaDestino >= 0 &&
+                            columnaDestino < Mapa::col
+                            ) {
+
+                            if (tankselected == nullptr) {
+                                tankselected = tanques.buscarTanqueEnCelda(
                                     filaDestino,
                                     columnaDestino
                                 );
 
-                                int chance = random.randomEntero(1, 100);
-
-                                if (tankselected->gettipo() == 1) {
-                                    if (chance <= 50) {
-                                        // Blue and cyan tanks use BFS with 50 percent
-                                        hayRuta = pathfinder.buscarRutaBFS(
-                                            grafo,
-                                            tanques,
-											tankselected,
-                                            nodoInicio,
-                                            nodoDestino,
-                                            camino,
-                                            tamanoCamino
-                                        );
+                                if (tankselected != nullptr) {
+                                    if(turnManager.isPlayerTurn(tankselected->getplayer())){
+                                        hayRuta = false;
+                                        tamanoCamino = 0;
+                                        bullet.clearTrail();
                                     }
                                     else {
-                                        // Blue and cyan tanks use random movement with 50 percent
-                                        hayRuta = pathfinder.buscarRutaRandom(
-                                            grafo,
-                                            map,
-                                            tanques,
-                                            tankselected,
-                                            nodoInicio,
-                                            camino,
-                                            tamanoCamino,
-                                            4,
-                                            random
-                                        );
+									    tankselected = nullptr;
                                     }
                                 }
-                                else {
-                                    if (chance <= 80) {
-                                        // Red and yellow tanks use Dijkstra with 80 percent
-                                        hayRuta = pathfinder.buscarRutaDijkstra(
-                                            grafo,
-                                            tanques,
-                                            tankselected,
-                                            nodoInicio,
-                                            nodoDestino,
-                                            camino,
-                                            tamanoCamino
-                                        );
+                            }
+                            else {
+                                if (
+                                    map.recorrible(map.m[filaDestino][columnaDestino]) &&
+                                    !tanques.celdaOcupada(filaDestino, columnaDestino)
+                                    ) {
+                                    int nodoInicio = grafo.obtenerNodo(
+                                        tankselected->getfila(),
+                                        tankselected->getcolumna()
+                                    );
+
+                                    int nodoDestino = grafo.obtenerNodo(
+                                        filaDestino,
+                                        columnaDestino
+                                    );
+
+                                    int chance = random.randomEntero(1, 100);
+
+                                    if (tankselected->gettipo() == 1) {
+                                        if (chance <= 50) {
+                                            // Blue and cyan tanks use BFS with 50 percent
+                                            hayRuta = pathfinder.buscarRutaBFS(
+                                                grafo,
+                                                tanques,
+                                                tankselected,
+                                                nodoInicio,
+                                                nodoDestino,
+                                                camino,
+                                                tamanoCamino
+                                            );
+                                        }
+                                        else {
+                                            // Blue and cyan tanks use random movement with 50 percent
+                                            hayRuta = pathfinder.rutalineavistrandom(
+                                                grafo,
+                                                map,
+                                                tanques,
+                                                tankselected,
+                                                nodoInicio,
+                                                nodoDestino,
+                                                camino,
+                                                tamanoCamino,
+                                                4,
+                                                random
+                                            );
+                                        }
                                     }
                                     else {
-                                        // Red and yellow tanks use random movement with 20 percent
-                                        hayRuta = pathfinder.buscarRutaRandom(
-                                            grafo,
-                                            map,
-                                            tanques,
-                                            tankselected,
-                                            nodoInicio,
-                                            camino,
-                                            tamanoCamino,
-                                            4,
-                                            random
-                                        );
+                                        if (chance <= 80) {
+                                            // Red and yellow tanks use Dijkstra with 80 percent
+                                            hayRuta = pathfinder.buscarRutaDijkstra(
+                                                grafo,
+                                                tanques,
+                                                tankselected,
+                                                nodoInicio,
+                                                nodoDestino,
+                                                camino,
+                                                tamanoCamino
+                                            );
+                                        }
+                                        else {
+                                            // Red and yellow tanks use random movement with 20 percent
+                                            hayRuta = pathfinder.buscarRutaRandom(
+                                                grafo,
+                                                map,
+                                                tanques,
+                                                tankselected,
+                                                nodoInicio,
+                                                camino,
+                                                tamanoCamino,
+                                                4,
+                                                random
+                                            );
+                                        }
                                     }
+
+                                    if (hayRuta && tamanoCamino > 0) {
+                                        int nodoFinal = camino[tamanoCamino - 1];
+
+                                        int nuevaFila = grafo.obtenerFila(nodoFinal);
+                                        int nuevaColumna = grafo.obtenerColumna(nodoFinal);
+
+                                        tankselected->move(nuevaFila, nuevaColumna);
+
+                                        turnManager.nextTurn();
+                                    }
+
+                                    tankselected = nullptr;
                                 }
-
-                                if (hayRuta && tamanoCamino > 0) {
-                                    int nodoFinal = camino[tamanoCamino - 1];
-
-                                    int nuevaFila = grafo.obtenerFila(nodoFinal);
-                                    int nuevaColumna = grafo.obtenerColumna(nodoFinal);
-
-                                    tankselected->move(nuevaFila, nuevaColumna);
-
-									turnManager.nextTurn();
-                                }
-
-                                tankselected = nullptr;
                             }
                         }
                     }
@@ -256,8 +261,8 @@ int main()
 
                 if (mouseButton->button == sf::Mouse::Button::Right) {
 
-                    int targetRow = int((mouseButton->position.x - mapaOffsetX) / tamanoCelda);
-                    int targetCol = int((mouseButton->position.y - mapaOffsetY) / tamanoCelda);
+                    int targetCol = int((mouseButton->position.x - mapaOffsetX) / tamanoCelda);
+                    int targetRow = int((mouseButton->position.y - mapaOffsetY) / tamanoCelda);
 
                     bool clickDentroDelMapa =
                         mouseButton->position.x >= mapaOffsetX &&
@@ -287,6 +292,7 @@ int main()
                             tankselected = nullptr;
 
 							turnManager.nextTurn();
+                            bullet.clearTrail();
                         }
                     }
                 }

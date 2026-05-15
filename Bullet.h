@@ -38,4 +38,6 @@ public:
     void shoot(Tank* shooter, int targetRow, int targetCol, float cellSize);
     void update(float deltaTime, Mapa& map, listaTank& tanks, float cellSize);
     void draw(sf::RenderWindow& window, float offsetX, float offsetY);
+       
+    void deactivate();
 };

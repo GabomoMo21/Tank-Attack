@@ -237,3 +237,8 @@ void Bullet::draw(sf::RenderWindow& window, float offsetX, float offsetY) {
 
     window.draw(bulletShape);
 }
+
+void Bullet::deactivate() {
+    active = false;
+	clearTrail();
+}

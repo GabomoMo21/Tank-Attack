@@ -38,4 +38,29 @@ public:
         RandomGenerator& random
     );
     bool validacionBFS(Mapa& map);
+
+
+    bool rutalineavist(
+		Grafo& grafo,
+		Mapa& map,
+		listaTank& tanques,
+		Tank* tanqueActual,
+		int nodoInicio,
+		int nodoDestino,
+		int camino[],
+		int& tamanoCamino
+    );
+
+    bool rutalineavistrandom(
+        Grafo& grafo,
+        Mapa& map,
+        listaTank& tanques,
+        Tank* tanqueActual,
+        int nodoInicio,
+        int nodoDestino,
+        int camino[],
+        int& tamanoCamino,
+		int radio,
+		RandomGenerator& random
+    );
 };

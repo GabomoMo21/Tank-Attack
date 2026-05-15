@@ -287,3 +287,204 @@ bool Pathfinder::validacionBFS(Mapa& map) {
 
     return visitados == totalRecorrible;
 }
+
+bool Pathfinder::rutalineavist(
+    Grafo& grafo,
+    Mapa& map,
+    listaTank& tanques,
+    Tank* tanqueActual,
+    int nodoInicio,
+    int nodoDestino,
+    int camino[],
+    int& tamanoCamino
+) {
+    tamanoCamino = 0;
+
+    int filaInicio = grafo.obtenerFila(nodoInicio);
+    int colInicio = grafo.obtenerColumna(nodoInicio);
+
+    int filaDestino = grafo.obtenerFila(nodoDestino);
+    int colDestino = grafo.obtenerColumna(nodoDestino);
+
+    int filaActual = filaInicio;
+    int colActual = colInicio;
+
+    int diferenciaFila = filaDestino - filaInicio;
+    int diferenciaCol = colDestino - colInicio;
+
+    int pasos = abs(diferenciaFila);
+
+    if (abs(diferenciaCol) > pasos) {
+        pasos = abs(diferenciaCol);
+    }
+
+    if (pasos == 0) {
+        camino[0] = nodoInicio;
+        tamanoCamino = 1;
+        return true;
+    }
+
+    float incrementoFila = float(diferenciaFila) / float(pasos);
+    float incrementoCol = float(diferenciaCol) / float(pasos);
+
+    float filaFloat = float(filaInicio);
+    float colFloat = float(colInicio);
+
+    camino[tamanoCamino] = nodoInicio;
+    tamanoCamino++;
+
+    for (int i = 1; i <= pasos; i++) {
+        filaFloat += incrementoFila;
+        colFloat += incrementoCol;
+
+        int nuevaFila = int(filaFloat + 0.5f);
+        int nuevaCol = int(colFloat + 0.5f);
+
+        if (
+            nuevaFila < 0 ||
+            nuevaFila >= Mapa::fil ||
+            nuevaCol < 0 ||
+            nuevaCol >= Mapa::col
+            ) {
+            return false;
+        }
+
+        if (!map.recorrible(map.m[nuevaFila][nuevaCol])) {
+            return false;
+        }
+
+        if (tanques.cellOccupiedExcept(nuevaFila, nuevaCol, tanqueActual)) {
+            return false;
+        }
+
+        if (nuevaFila != filaActual || nuevaCol != colActual) {
+            int nodoNuevo = grafo.obtenerNodo(nuevaFila, nuevaCol);
+
+            camino[tamanoCamino] = nodoNuevo;
+            tamanoCamino++;
+
+            filaActual = nuevaFila;
+            colActual = nuevaCol;
+        }
+    }
+
+    return filaActual == filaDestino && colActual == colDestino;
+}
+
+bool Pathfinder::rutalineavistrandom(
+    Grafo& grafo,
+    Mapa& map,
+    listaTank& tanques,
+    Tank* tanqueActual,
+    int nodoInicio,
+    int nodoDestino,
+    int camino[],
+    int& tamanoCamino,
+    int radio,
+    RandomGenerator& random
+) {
+    int caminoTemporal[Grafo::totalNodos];
+    int tamanoTemporal = 0;
+
+    // Primer intento: línea vista directa hacia el destino original.
+    bool llegoDirecto = rutalineavist(
+        grafo,
+        map,
+        tanques,
+        tanqueActual,
+        nodoInicio,
+        nodoDestino,
+        camino,
+        tamanoCamino
+    );
+
+    if (llegoDirecto) {
+        return true;
+    }
+
+    int mejorCamino[Grafo::totalNodos];
+    int mejorTamano = tamanoCamino;
+
+    for (int i = 0; i < tamanoCamino; i++) {
+        mejorCamino[i] = camino[i];
+    }
+
+    int filaInicio = grafo.obtenerFila(nodoInicio);
+    int colInicio = grafo.obtenerColumna(nodoInicio);
+
+    int filaRandom = -1;
+    int colRandom = -1;
+
+    bool encontroCeldaRandom = false;
+
+    for (int intento = 0; intento < 20; intento++) {
+        filaRandom = filaInicio + random.randomEntero(-radio, radio);
+        colRandom = colInicio + random.randomEntero(-radio, radio);
+
+        if (
+            filaRandom >= 0 &&
+            filaRandom < Mapa::fil &&
+            colRandom >= 0 &&
+            colRandom < Mapa::col &&
+            map.recorrible(map.m[filaRandom][colRandom]) &&
+            !tanques.cellOccupiedExcept(filaRandom, colRandom, tanqueActual)
+            ) {
+            encontroCeldaRandom = true;
+            break;
+        }
+    }
+
+    if (!encontroCeldaRandom) {
+        for (int i = 0; i < mejorTamano; i++) {
+            camino[i] = mejorCamino[i];
+        }
+
+        tamanoCamino = mejorTamano;
+        return tamanoCamino > 0;
+    }
+
+    int nodoRandom = grafo.obtenerNodo(filaRandom, colRandom);
+
+    // ir en línea vista hacia la celda random.
+    bool llegoRandom = rutalineavist(
+        grafo,
+        map,
+        tanques,
+        tanqueActual,
+        nodoInicio,
+        nodoRandom,
+        camino,
+        tamanoCamino
+    );
+
+    if (!llegoRandom) {
+        return tamanoCamino > 0;
+    }
+
+    int nodoDesdeRandom = camino[tamanoCamino - 1];
+
+    int caminoSegundoTramo[Grafo::totalNodos];
+    int tamanoSegundoTramo = 0;
+
+    //  intentar línea vista al destino original.
+    bool llegoDestino = rutalineavist(
+        grafo,
+        map,
+        tanques,
+        tanqueActual,
+        nodoDesdeRandom,
+        nodoDestino,
+        caminoSegundoTramo,
+        tamanoSegundoTramo
+    );
+
+    // Unir tramos
+    for (int i = 1; i < tamanoSegundoTramo; i++) {
+        if (tamanoCamino < Grafo::totalNodos) {
+            camino[tamanoCamino] = caminoSegundoTramo[i];
+            tamanoCamino++;
+        }
+    }
+
+    return tamanoCamino > 0;
+}
