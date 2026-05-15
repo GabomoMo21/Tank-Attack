@@ -32,4 +32,9 @@ public:
     void dibujarTodos(sf::RenderWindow& ventana, float tamanoCelda);
 
     bool cellOccupiedExcept(int fila, int columna, Tank* tanqueIgnorado);
+
+    void drawlife(
+		sf::RenderWindow& ventana, sf::Font& font, float x, float y
+    );
+
 };

@@ -109,6 +109,41 @@ void listaTank::dibujarTodos(sf::RenderWindow& ventana, float tamanoCelda) {
     }
 }
 
+void listaTank::drawlife(
+    sf::RenderWindow& ventana, sf::Font& font, float x, float y
+) {
+	NodoTank* actual = head;
+
+    int contador = 1;
+	float separacion = 28.0f;
+
+    while (actual != nullptr) {
+        std::string texto = 
+            "J" + std::to_string(actual-> tank.getplayer()) +
+			"T" + std::to_string(contador) +
+			":" + std::to_string(actual->tank.getvida());
+
+        if (!actual->tank.estavivo()) {
+            texto += "x";
+        }
+
+		sf::Text vidaTexto(font);
+		vidaTexto.setString(texto);
+		vidaTexto.setCharacterSize(15);
+		vidaTexto.setFillColor(actual->tank.getcolor());
+		vidaTexto.setPosition({ x, y });
+
+		ventana.draw(vidaTexto);
+
+		y += separacion;
+		contador++;
+
+		actual = actual->next;
+    
+    }
+
+}
+
 bool listaTank::cellOccupiedExcept(int fila, int columna, Tank* tanqueignorado) {
     NodoTank* actual = head;
 

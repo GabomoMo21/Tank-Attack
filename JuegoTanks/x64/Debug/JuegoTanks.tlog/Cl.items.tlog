@@ -1,1 +1,14 @@
+C:\Users\gabri\Desktop\JuegoTanks\Bullet.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\Bullet.obj
+C:\Users\gabri\Desktop\JuegoTanks\DrawUtils.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\DrawUtils.obj
+C:\Users\gabri\Desktop\JuegoTanks\GameTimer.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\GameTimer.obj
+C:\Users\gabri\Desktop\JuegoTanks\HUD.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\HUD.obj
 C:\Users\gabri\Desktop\JuegoTanks\main.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\main.obj
+C:\Users\gabri\Desktop\JuegoTanks\Queue.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\Queue.obj
+C:\Users\gabri\Desktop\JuegoTanks\RandomGenerator.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\RandomGenerator.obj
+C:\Users\gabri\Desktop\JuegoTanks\Mapa.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\Mapa.obj
+C:\Users\gabri\Desktop\JuegoTanks\Grafo.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\Grafo.obj
+C:\Users\gabri\Desktop\JuegoTanks\Pathfinder.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\Pathfinder.obj
+C:\Users\gabri\Desktop\JuegoTanks\Tank.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\Tank.obj
+C:\Users\gabri\Desktop\JuegoTanks\TankFactory.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\TankFactory.obj
+C:\Users\gabri\Desktop\JuegoTanks\TankList.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\TankList.obj
+C:\Users\gabri\Desktop\JuegoTanks\TurnManager.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\TurnManager.obj

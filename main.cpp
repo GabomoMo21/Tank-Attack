@@ -15,7 +15,7 @@
 #include <string>
 #include "GameTimer.h"
 #include <string>
-
+#include "HUD.h"
 
 int main()
 {
@@ -26,6 +26,7 @@ int main()
     listaTank tanques;
 	TurnManager turnManager;
 	GameTimer gameTimer(300.0f);
+	HUD hud;
 
     tanques.agregar(TankFactory::creartanqueazul(1, 1));
     tanques.agregar(TankFactory::creartanqueazul(1, 2));
@@ -45,6 +46,8 @@ int main()
 
     Bullet bullet;
 
+	
+
     do {
         map.generarmaparandom(random);
     } while (!pathfinder.validacionBFS(map));
@@ -61,6 +64,7 @@ int main()
 
     sf::Texture suelo;
     sf::Texture pared;
+    sf::Font font;
 
     if (!suelo.loadFromFile("suelo.png")) {
         std::cout << "Error loading suelo.png\n";
@@ -68,6 +72,11 @@ int main()
 
     if (!pared.loadFromFile("pared.png")) {
         std::cout << "Error loading pared.png\n";
+    }
+
+    if (!font.openFromFile("PixelifySans-VariableFont_wght.ttf")) {
+        std::cout << "Error loading font\n";
+        return -1;
     }
 
     const float tamanoCelda = 40.0f;
@@ -292,6 +301,8 @@ int main()
         tanques.dibujarTodos(mapa, tamanoCelda);
 
         bullet.draw(mapa);
+
+        hud.draw(mapa, font, tanques, turnManager, gameTimer);
 
         mapa.display();
 }

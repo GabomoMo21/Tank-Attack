@@ -154,6 +154,7 @@
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="DrawUtils.cpp" />
     <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="HUD.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Queue.cpp" />
     <ClCompile Include="RandomGenerator.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="DrawUtils.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="Grafo.h" />
+    <ClInclude Include="HUD.h" />
     <ClInclude Include="Pathfinder.h" />
     <ClInclude Include="Mapa.h" />
     <ClInclude Include="RandomGenerator.h" />
