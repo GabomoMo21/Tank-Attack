@@ -29,12 +29,19 @@ public:
 
     int getWinnerByAliveTanks();
 
-    void dibujarTodos(sf::RenderWindow& ventana, float tamanoCelda);
+    void dibujarTodos(sf::RenderWindow& ventana,
+        float tamanoCelda,
+        float offsetX,
+        float offsetY);
 
     bool cellOccupiedExcept(int fila, int columna, Tank* tanqueIgnorado);
 
     void drawlife(
-		sf::RenderWindow& ventana, sf::Font& font, float x, float y
+        sf::RenderWindow& ventana,
+        sf::Font& font,
+        int jugador,
+        float x,
+        float y
     );
 
 };

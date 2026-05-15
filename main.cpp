@@ -17,6 +17,7 @@
 #include <string>
 #include "HUD.h"
 
+
 int main()
 {
     RandomGenerator random;
@@ -55,8 +56,8 @@ int main()
     grafo.generarMatrizadyacencia(map);
 
     sf::RenderWindow mapa(
-        sf::VideoMode({ 800u, 600u }),
-        "Mapa",
+        sf::VideoMode({ 800u, 660u }),
+        "Tank Attack",
         sf::Style::Resize
     );
 
@@ -80,6 +81,12 @@ int main()
     }
 
     const float tamanoCelda = 40.0f;
+    const float headerAltura = 60.0f;
+    const float mapaOffsetX = 0.0f;
+    const float mapaOffsetY = headerAltura;
+
+    const float hudX = 600.0f;
+    const float hudAncho = 200.0f;
 
     while (mapa.isOpen()) {
         float deltaTime = gameClock.restart().asSeconds();
@@ -120,8 +127,18 @@ int main()
 
             if (const auto* mouseButton = event->getIf<sf::Event::MouseButtonPressed>()) {
                 if (mouseButton->button == sf::Mouse::Button::Left) {
-                    int columnaDestino = int(mouseButton->position.x / tamanoCelda);
-                    int filaDestino = int(mouseButton->position.y / tamanoCelda);
+                    int columnaDestino = int((mouseButton->position.x - mapaOffsetX) / tamanoCelda);
+                    int filaDestino = int((mouseButton->position.y - mapaOffsetY) / tamanoCelda);
+
+                    bool clickDentroDelMapa =
+                        mouseButton->position.x >= mapaOffsetX &&
+                        mouseButton->position.x < mapaOffsetX + Mapa::col * tamanoCelda &&
+                        mouseButton->position.y >= mapaOffsetY &&
+                        mouseButton->position.y < mapaOffsetY + Mapa::fil * tamanoCelda;
+
+                    if (!clickDentroDelMapa) {
+                        continue;
+                    }
 
                     if (
                         filaDestino >= 0 &&
@@ -238,8 +255,19 @@ int main()
                 }
 
                 if (mouseButton->button == sf::Mouse::Button::Right) {
-                    int targetCol = int(mouseButton->position.x / tamanoCelda);
-                    int targetRow = int(mouseButton->position.y / tamanoCelda);
+
+                    int targetRow = int((mouseButton->position.x - mapaOffsetX) / tamanoCelda);
+                    int targetCol = int((mouseButton->position.y - mapaOffsetY) / tamanoCelda);
+
+                    bool clickDentroDelMapa =
+                        mouseButton->position.x >= mapaOffsetX &&
+                        mouseButton->position.x < mapaOffsetX + Mapa::col * tamanoCelda &&
+                        mouseButton->position.y >= mapaOffsetY &&
+                        mouseButton->position.y < mapaOffsetY + Mapa::fil * tamanoCelda;
+
+                    if (!clickDentroDelMapa) {
+                        continue;
+                    }
 
                     if (
                         targetRow >= 0 &&
@@ -292,17 +320,17 @@ int main()
 
         mapa.clear(sf::Color::Black);
 
-        dibujarmapa(mapa, map, suelo, pared, tamanoCelda);
+        hud.draw(mapa, font, tanques, turnManager, gameTimer);
+
+        dibujarmapa(mapa, map, suelo, pared, tamanoCelda, mapaOffsetX, mapaOffsetY);
 
         if (hayRuta) {
-            dibujarRuta(mapa, grafo, camino, tamanoCamino, tamanoCelda);
+            dibujarRuta(mapa, grafo, camino, tamanoCamino, tamanoCelda, mapaOffsetX, mapaOffsetY);
         }
 
-        tanques.dibujarTodos(mapa, tamanoCelda);
+        tanques.dibujarTodos(mapa, tamanoCelda, mapaOffsetX, mapaOffsetY);
 
-        bullet.draw(mapa);
-
-        hud.draw(mapa, font, tanques, turnManager, gameTimer);
+        bullet.draw(mapa, mapaOffsetX, mapaOffsetY);
 
         mapa.display();
 }

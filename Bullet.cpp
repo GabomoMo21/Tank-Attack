@@ -202,13 +202,18 @@ void Bullet::update(float deltaTime, Mapa& map, listaTank& tanks, float cellSize
     }
 }
 
-void Bullet::draw(sf::RenderWindow& window) {
+void Bullet::draw(sf::RenderWindow& window, float offsetX, float offsetY) {
     // Draw bullet trail
     for (int i = 0; i < trailSize; i++) {
         sf::CircleShape point;
         point.setRadius(3.0f);
         point.setOrigin({ 3.0f, 3.0f });
-        point.setPosition({ trailX[i], trailY[i] });
+
+        point.setPosition({
+            offsetX + trailX[i],
+            offsetY + trailY[i]
+            });
+
         point.setFillColor(sf::Color(230, 230, 230));
 
         window.draw(point);
@@ -222,7 +227,12 @@ void Bullet::draw(sf::RenderWindow& window) {
     sf::CircleShape bulletShape;
     bulletShape.setRadius(6.0f);
     bulletShape.setOrigin({ 6.0f, 6.0f });
-    bulletShape.setPosition({ x, y });
+
+    bulletShape.setPosition({
+        offsetX + x,
+        offsetY + y
+        });
+
     bulletShape.setFillColor(sf::Color::White);
 
     window.draw(bulletShape);

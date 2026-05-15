@@ -10,7 +10,9 @@ void dibujarRuta(
     Grafo& grafo,
     int camino[],
     int tamanoCamino,
-    float tamanoCelda
+    float tamanoCelda,
+    float offsetX,
+    float offsetY
 );
 
 void dibujarcelda(
@@ -18,7 +20,9 @@ void dibujarcelda(
     sf::Texture& textura,
     int fila,
     int columna,
-    float tamanoCelda
+    float tamanoCelda,
+    float offsetX,
+    float offsetY
 );
 
 void dibujarmapa(
@@ -26,11 +30,15 @@ void dibujarmapa(
     Mapa& map,
     sf::Texture& suelo,
     sf::Texture& pared,
-    float tamanoCelda
+    float tamanoCelda,
+    float offsetX,
+    float offsetY
 );
 
 void dibujartank(
     sf::RenderWindow& ventana,
     Tank& tank,
-    float tamanoCelda
+    float tamanoCelda,
+    float offsetX,
+    float offsetY
 );

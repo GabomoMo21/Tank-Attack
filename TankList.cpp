@@ -100,48 +100,58 @@ int listaTank::getWinnerByAliveTanks() {
 
     return 0;
 }
-void listaTank::dibujarTodos(sf::RenderWindow& ventana, float tamanoCelda) {
+
+
+void listaTank::dibujarTodos(
+    sf::RenderWindow& ventana,
+    float tamanoCelda,
+    float offsetX,
+    float offsetY
+) {
     NodoTank* actual = head;
 
     while (actual != nullptr) {
-        dibujartank(ventana, actual->tank, tamanoCelda);
+        dibujartank(ventana, actual->tank, tamanoCelda, offsetX, offsetY);
         actual = actual->next;
     }
 }
 
 void listaTank::drawlife(
-    sf::RenderWindow& ventana, sf::Font& font, float x, float y
+    sf::RenderWindow& ventana,
+    sf::Font& font,
+    int jugador,
+    float x,
+    float y
 ) {
-	NodoTank* actual = head;
+    NodoTank* actual = head;
 
     int contador = 1;
-	float separacion = 28.0f;
+    float separacion = 24.0f;
 
     while (actual != nullptr) {
-        std::string texto = 
-            "J" + std::to_string(actual-> tank.getplayer()) +
-			"T" + std::to_string(contador) +
-			":" + std::to_string(actual->tank.getvida());
+        if (actual->tank.getplayer() == jugador) {
+            std::string texto =
+                "T" + std::to_string(contador) +
+                ": " + std::to_string(actual->tank.getvida());
 
-        if (!actual->tank.estavivo()) {
-            texto += "x";
+            if (!actual->tank.estavivo()) {
+                texto += " X";
+            }
+
+            sf::Text vidaTexto(font);
+            vidaTexto.setString(texto);
+            vidaTexto.setCharacterSize(14);
+            vidaTexto.setFillColor(actual->tank.getcolor());
+            vidaTexto.setPosition({ x, y });
+
+            ventana.draw(vidaTexto);
+
+            y += separacion;
+            contador++;
         }
 
-		sf::Text vidaTexto(font);
-		vidaTexto.setString(texto);
-		vidaTexto.setCharacterSize(15);
-		vidaTexto.setFillColor(actual->tank.getcolor());
-		vidaTexto.setPosition({ x, y });
-
-		ventana.draw(vidaTexto);
-
-		y += separacion;
-		contador++;
-
-		actual = actual->next;
-    
+        actual = actual->next;
     }
-
 }
 
 bool listaTank::cellOccupiedExcept(int fila, int columna, Tank* tanqueignorado) {

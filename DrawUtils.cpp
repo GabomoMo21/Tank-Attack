@@ -5,7 +5,9 @@ void dibujarRuta(
     Grafo& grafo,
     int camino[],
     int tamanoCamino,
-    float tamanoCelda
+    float tamanoCelda,
+    float offsetX,
+    float offsetY
 ) {
     for (int i = 1; i < tamanoCamino - 1; i++) {
         int nodo = camino[i];
@@ -17,8 +19,8 @@ void dibujarRuta(
         celdaRuta.setSize({ tamanoCelda, tamanoCelda });
 
         celdaRuta.setPosition({
-            columna * tamanoCelda,
-            fila * tamanoCelda
+            offsetX + columna * tamanoCelda,
+            offsetY + fila * tamanoCelda
             });
 
         celdaRuta.setFillColor(sf::Color(255, 255, 0, 120));
@@ -32,13 +34,15 @@ void dibujarcelda(
     sf::Texture& textura,
     int fila,
     int columna,
-    float tamanoCelda
+    float tamanoCelda,
+    float offsetX,
+    float offsetY
 ) {
     sf::Sprite sprite(textura);
 
     sprite.setPosition({
-        columna * tamanoCelda,
-        fila * tamanoCelda
+        offsetX + columna * tamanoCelda,
+        offsetY + fila * tamanoCelda
         });
 
     sprite.setScale({
@@ -54,15 +58,34 @@ void dibujarmapa(
     Mapa& map,
     sf::Texture& suelo,
     sf::Texture& pared,
-    float tamanoCelda
+    float tamanoCelda,
+    float offsetX,
+    float offsetY
 ) {
     for (int i = 0; i < Mapa::fil; i++) {
         for (int j = 0; j < Mapa::col; j++) {
+
             if (map.m[i][j] == 0) {
-                dibujarcelda(ventana, suelo, i, j, tamanoCelda);
+                dibujarcelda(
+                    ventana,
+                    suelo,
+                    i,
+                    j,
+                    tamanoCelda,
+                    offsetX,
+                    offsetY
+                );
             }
             else if (map.m[i][j] == 1) {
-                dibujarcelda(ventana, pared, i, j, tamanoCelda);
+                dibujarcelda(
+                    ventana,
+                    pared,
+                    i,
+                    j,
+                    tamanoCelda,
+                    offsetX,
+                    offsetY
+                );
             }
         }
     }
@@ -71,14 +94,16 @@ void dibujarmapa(
 void dibujartank(
     sf::RenderWindow& ventana,
     Tank& tank,
-    float tamanoCelda
+    float tamanoCelda,
+    float offsetX,
+    float offsetY
 ) {
     if (!tank.estavivo()) {
         return;
     }
 
-    float x = tank.getcolumna() * tamanoCelda;
-    float y = tank.getfila() * tamanoCelda;
+    float x = offsetX + tank.getcolumna() * tamanoCelda;
+    float y = offsetY + tank.getfila() * tamanoCelda;
 
     sf::RectangleShape cuerpo;
     cuerpo.setSize({ tamanoCelda * 0.8f, tamanoCelda * 0.8f });
