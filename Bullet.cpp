@@ -22,11 +22,20 @@ Bullet::Bullet() {
     canHitOwner = false;
 
     trailSize = 0;
+    fullPower = false;
 
     for (int i = 0; i < 400; i++) {
         trailX[i] = 0.0f;
         trailY[i] = 0.0f;
     }
+    useAStarRoute = false;
+    routeSize = 0;
+    routeIndex = 0;
+
+    for (int i = 0; i < 400; i++) {
+        routeRows[i] = 0;
+        routeCols[i] = 0;
+    }   
 }
 
 bool Bullet::isActive() {
@@ -50,13 +59,16 @@ void Bullet::addTrailPoint() {
     }
 }
 
-void Bullet::shoot(Tank* shooter, int targetRow, int targetCol, float cellSize) {
+void Bullet::shoot(Tank* shooter, int targetRow, int targetCol, float cellSize, bool fullPower){
     if (shooter == nullptr) {
         return;
     }
-
+    this->fullPower = fullPower;
     owner = shooter;
     active = true;
+    useAStarRoute = false;
+    routeSize = 0;
+    routeIndex = 0;
 
     bounceCount = 0;
     canHitOwner = false;
@@ -87,9 +99,112 @@ void Bullet::shoot(Tank* shooter, int targetRow, int targetCol, float cellSize) 
 
     addTrailPoint();
 }
+void Bullet::shootAStar(
+    Tank* shooter,
+    int route[],
+    int routeSize,
+    float cellSize,
+    bool fullPower,
+    Grafo& grafo
+) {
+    if (shooter == nullptr) {
+        return;
+    }
+
+    if (routeSize <= 0) {
+        return;
+    }
+
+    this->fullPower = fullPower;
+    owner = shooter;
+    active = true;
+
+    useAStarRoute = true;
+    this->routeSize = routeSize;
+    routeIndex = 0;
+
+    bounceCount = 0;
+    canHitOwner = false;
+
+    clearTrail();
+
+    // Start in the center of the tank cell
+    x = shooter->getcolumna() * cellSize + cellSize / 2.0f;
+    y = shooter->getfila() * cellSize + cellSize / 2.0f;
+
+    for (int i = 0; i < routeSize && i < 400; i++) {
+        routeRows[i] = grafo.obtenerFila(route[i]);
+        routeCols[i] = grafo.obtenerColumna(route[i]);
+    }
+
+    addTrailPoint();
+}
 
 void Bullet::update(float deltaTime, Mapa& map, listaTank& tanks, float cellSize) {
     if (!active) {
+        return;
+    }
+    if (useAStarRoute) {
+        if (routeIndex >= routeSize) {
+            active = false;
+            return;
+        }
+
+        float targetX = routeCols[routeIndex] * cellSize + cellSize / 2.0f;
+        float targetY = routeRows[routeIndex] * cellSize + cellSize / 2.0f;
+
+        float dx = targetX - x;
+        float dy = targetY - y;
+
+        float distance = std::sqrt(dx * dx + dy * dy);
+
+        if (distance < 5.0f) {
+            routeIndex++;
+            return;
+        }
+
+        if (distance > 0.0f) {
+            dirX = dx / distance;
+            dirY = dy / distance;
+        }
+
+        x += dirX * speed * deltaTime;
+        y += dirY * speed * deltaTime;
+
+        addTrailPoint();
+
+        int bulletRow = int(y / cellSize);
+        int bulletCol = int(x / cellSize);
+
+        Tank* hitTank = tanks.buscarTanqueEnCelda(bulletRow, bulletCol);
+
+        if (hitTank != nullptr) {
+            if (hitTank == owner && !canHitOwner) {
+                if (
+                    bulletRow != owner->getfila() ||
+                    bulletCol != owner->getcolumna()
+                    ) {
+                    canHitOwner = true;
+                }
+
+                return;
+            }
+
+            int damage = 25;
+
+            if (hitTank->gettipo() == 2) {
+                damage = 50;
+            }
+
+            if (fullPower) {
+                damage = 100;
+            }
+
+            hitTank->getdamage(damage);
+
+            active = false;
+        }
+
         return;
     }
 
@@ -196,11 +311,16 @@ void Bullet::update(float deltaTime, Mapa& map, listaTank& tanks, float cellSize
             damage = 50;
         }
 
+        if (fullPower) {
+            damage = 100;
+        }
+
         hitTank->getdamage(damage);
 
         active = false;
     }
 }
+
 
 void Bullet::draw(sf::RenderWindow& window, float offsetX, float offsetY) {
     // Draw bullet trail

@@ -2,16 +2,20 @@
 
 class TurnManager {
 private:
-	int ActualPlayer, TurnNumber;
+    int actualPlayer;
+    int turnNumber;
+
+    int extraTurnPlayer;
+    int extraTurnsLeft;
 
 public:
-	TurnManager();
+    TurnManager();
 
-	int getActualPlayer();
-	int getTurnNumber();
+    int getActualPlayer();
+    int getTurnNumber();
 
-	void nextTurn();
+    void nextTurn();
+    bool isPlayerTurn(int player);
 
-	bool isPlayerTurn(int player);
-
+    void activateDoubleTurn(int player);
 };

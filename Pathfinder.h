@@ -26,6 +26,15 @@ public:
         int camino[],
         int& tamanoCamino
     );
+    bool buscarRutaAStar(
+        Grafo& grafo,
+        listaTank& tanques,
+        Tank* tanqueActual,
+        int nodoInicio,
+        int nodoDestino,
+        int camino[],
+        int& tamanoCamino
+    );
     bool buscarRutaRandom(
         Grafo& grafo,
         Mapa& map,

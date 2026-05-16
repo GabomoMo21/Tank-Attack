@@ -1,30 +1,41 @@
 #include "TurnManager.h"
 
 TurnManager::TurnManager() {
-	ActualPlayer = 1;
-	TurnNumber = 1;
+	actualPlayer = 1;
+	turnNumber = 1;
+	extraTurnPlayer = 0;
+	extraTurnsLeft = 0;
 }
 
 int TurnManager::getActualPlayer() {
-	return ActualPlayer;
+	return actualPlayer;
 }
 
 int TurnManager::getTurnNumber() {
-	return TurnNumber;
+	return turnNumber;
 }
 
 void TurnManager::nextTurn() {
-	if(ActualPlayer==1) {
-		ActualPlayer = 2;
-	}
-	else {
-		ActualPlayer = 1;
-	}
+    turnNumber++;
 
-	TurnNumber++;
+    if (extraTurnsLeft > 0 && actualPlayer == extraTurnPlayer) {
+        extraTurnsLeft--;
+        return;
+    }
+
+    if (actualPlayer == 1) {
+        actualPlayer = 2;
+    }
+    else {
+        actualPlayer = 1;
+    }
+}
+void TurnManager::activateDoubleTurn(int player) {
+    extraTurnPlayer = player;
+    extraTurnsLeft = 2;
 }
 
 bool TurnManager::isPlayerTurn(int player) {
-	return player == ActualPlayer;
+	return player == actualPlayer;
 }
 

@@ -9,7 +9,8 @@ void HUD::draw(
     sf::Font& font,
     listaTank& tanques,
     TurnManager& turnManager,
-    GameTimer& gameTimer
+    GameTimer& gameTimer,
+    PowerUpManager& powerUpManager
 ) {
     float headerH = 60.0f;
 
@@ -136,18 +137,41 @@ void HUD::draw(
         hudX + 110.0f,
         hudContenidoY + 115.0f
     );
-    // Power-ups vacíos por ahora
-    sf::Text power1(font);
-    power1.setString("power\nups j1");
-    power1.setCharacterSize(18);
-    power1.setFillColor(textColor);
-    power1.setPosition({ hudX + 10.0f, powerY + 60.0f });
-    ventana.draw(power1);
+    // This draws player 1 power ups
+    sf::Text powerTitle1(font);
+    powerTitle1.setString("P1 powers");
+    powerTitle1.setCharacterSize(14);
+    powerTitle1.setFillColor(textColor);
+    powerTitle1.setPosition({ hudX + 10.0f, powerY + 15.0f });
+    ventana.draw(powerTitle1);
 
-    sf::Text power2(font);
-    power2.setString("power\nups j2");
-    power2.setCharacterSize(18);
-    power2.setFillColor(textColor);
-    power2.setPosition({ hudX + 110.0f, powerY + 60.0f });
-    ventana.draw(power2);
+    sf::Text powerList1(font);
+    powerList1.setString(powerUpManager.getQueueText(1));
+    powerList1.setCharacterSize(13);
+    powerList1.setFillColor(textColor);
+    powerList1.setPosition({ hudX + 10.0f, powerY + 45.0f });
+    ventana.draw(powerList1);
+
+    // This draws player 2 power ups
+    sf::Text powerTitle2(font);
+    powerTitle2.setString("P2 powers");
+    powerTitle2.setCharacterSize(14);
+    powerTitle2.setFillColor(textColor);
+    powerTitle2.setPosition({ hudX + 110.0f, powerY + 15.0f });
+    ventana.draw(powerTitle2);
+
+    sf::Text powerList2(font);
+    powerList2.setString(powerUpManager.getQueueText(2));
+    powerList2.setCharacterSize(13);
+    powerList2.setFillColor(textColor);
+    powerList2.setPosition({ hudX + 110.0f, powerY + 45.0f });
+    ventana.draw(powerList2);
+
+    // This draws the meaning of each short name
+    sf::Text legend(font);
+    legend.setString("DT double\nMP move\nAP aim\nPW power");
+    legend.setCharacterSize(11);
+    legend.setFillColor(sf::Color(180, 180, 180));
+    legend.setPosition({ hudX + 10.0f, powerY + 180.0f });
+    ventana.draw(legend);
 }

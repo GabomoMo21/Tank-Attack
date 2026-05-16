@@ -16,7 +16,8 @@
 #include "GameTimer.h"
 #include <string>
 #include "HUD.h"
-
+#include "PowerUpManager.h"
+#include "PowerUp.h"
 
 int main()
 {
@@ -28,6 +29,7 @@ int main()
 	TurnManager turnManager;
 	GameTimer gameTimer(300.0f);
 	HUD hud;
+    PowerUpManager powerUpManager;
 
     tanques.agregar(TankFactory::creartanqueazul(1, 1));
     tanques.agregar(TankFactory::creartanqueazul(1, 2));
@@ -38,6 +40,14 @@ int main()
     tanques.agregar(TankFactory::crearTanqueCeleste(13, 12));
     tanques.agregar(TankFactory::crearTanqueAmarillo(12, 13));
     tanques.agregar(TankFactory::crearTanqueAmarillo(12, 12));
+
+    powerUpManager.addPowerUp(1, POWER_DOUBLE_TURN);
+    powerUpManager.addPowerUp(1, POWER_MOVE_PRECISION);
+    powerUpManager.addPowerUp(1, POWER_ATTACK_POWER);
+
+    powerUpManager.addPowerUp(2, POWER_DOUBLE_TURN);
+    powerUpManager.addPowerUp(2, POWER_ATTACK_PRECISION);
+    powerUpManager.addPowerUp(2, POWER_ATTACK_POWER);
 
     Tank* tankselected = nullptr;
 
@@ -124,6 +134,22 @@ int main()
             if (event->is<sf::Event::Closed>()) {
                 mapa.close();
             }
+            if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+                if (keyPressed->code == sf::Keyboard::Key::LShift ||
+                    keyPressed->code == sf::Keyboard::Key::RShift) {
+
+                    if (!bullet.isActive()) {
+                        int player = turnManager.getActualPlayer();
+
+                        powerUpManager.consumePowerUp(player, turnManager);
+
+                        tankselected = nullptr;
+                        hayRuta = false;
+                        tamanoCamino = 0;
+                        bullet.clearTrail();
+                    }
+                }
+            }
 
             if (const auto* mouseButton = event->getIf<sf::Event::MouseButtonPressed>()) {
 
@@ -182,10 +208,20 @@ int main()
                                     );
 
                                     int chance = random.randomEntero(1, 100);
+                                    int player = tankselected->getplayer();
+
+                                    int typeOneLimit = 50;
+                                    int typeTwoLimit = 80;
+
+                                    // This power up makes the good movement chance 90 percent
+                                    if (powerUpManager.hasMovePrecision(player)) {
+                                        typeOneLimit = 90;
+                                        typeTwoLimit = 90;
+                                    }
 
                                     if (tankselected->gettipo() == 1) {
-                                        if (chance <= 50) {
-                                            // Blue and cyan tanks use BFS with 50 percent
+                                        if (chance <= typeOneLimit) {
+                                            // Blue and cyan tanks use BFS
                                             hayRuta = pathfinder.buscarRutaBFS(
                                                 grafo,
                                                 tanques,
@@ -197,7 +233,7 @@ int main()
                                             );
                                         }
                                         else {
-                                            // Blue and cyan tanks use random movement with 50 percent
+                                            // Blue and cyan tanks use random line movement
                                             hayRuta = pathfinder.rutalineavistrandom(
                                                 grafo,
                                                 map,
@@ -213,8 +249,8 @@ int main()
                                         }
                                     }
                                     else {
-                                        if (chance <= 80) {
-                                            // Red and yellow tanks use Dijkstra with 80 percent
+                                        if (chance <= typeTwoLimit) {
+                                            // Red and yellow tanks use Dijkstra
                                             hayRuta = pathfinder.buscarRutaDijkstra(
                                                 grafo,
                                                 tanques,
@@ -226,7 +262,7 @@ int main()
                                             );
                                         }
                                         else {
-                                            // Red and yellow tanks use random movement with 20 percent
+                                            // Red and yellow tanks use random movement
                                             hayRuta = pathfinder.buscarRutaRandom(
                                                 grafo,
                                                 map,
@@ -240,6 +276,7 @@ int main()
                                             );
                                         }
                                     }
+                                    
 
                                     if (hayRuta && tamanoCamino > 0) {
                                         int nodoFinal = camino[tamanoCamino - 1];
@@ -248,6 +285,9 @@ int main()
                                         int nuevaColumna = grafo.obtenerColumna(nodoFinal);
 
                                         tankselected->move(nuevaFila, nuevaColumna);
+
+                                        // This consumes the movement precision power after moving
+                                        powerUpManager.useMovePrecision(player);
 
                                         turnManager.nextTurn();
                                     }
@@ -281,18 +321,66 @@ int main()
                         targetCol < Mapa::col
                         ) {
                         if (tankselected != nullptr) {
-                            bullet.shoot(
-                                tankselected,
-                                targetRow,
-                                targetCol,
-                                tamanoCelda
-                            );
+                            int player = tankselected->getplayer();
 
-                            hayRuta = false;
-                            tankselected = nullptr;
+                            bool fullPower = powerUpManager.hasAttackPower(player);
+                            bool attackPrecision = powerUpManager.hasAttackPrecision(player);
 
-							turnManager.nextTurn();
-                            bullet.clearTrail();
+                            if (attackPrecision) {
+                                int nodoInicio = grafo.obtenerNodo(
+                                    tankselected->getfila(),
+                                    tankselected->getcolumna()
+                                );
+
+                                int nodoDestino = grafo.obtenerNodo(
+                                    targetRow,
+                                    targetCol
+                                );
+
+                                hayRuta = pathfinder.buscarRutaAStar(
+                                    grafo,
+                                    tanques,
+                                    tankselected,
+                                    nodoInicio,
+                                    nodoDestino,
+                                    camino,
+                                    tamanoCamino
+                                );
+
+                                if (hayRuta && tamanoCamino > 0) {
+                                    bullet.shootAStar(
+                                        tankselected,
+                                        camino,
+                                        tamanoCamino,
+                                        tamanoCelda,
+                                        fullPower,
+                                        grafo
+                                    );
+
+                                    powerUpManager.useAttackPrecision(player);
+                                    powerUpManager.useAttackPower(player);
+
+                                    tankselected = nullptr;
+
+                                    turnManager.nextTurn();
+                                }
+                            }
+                            else {
+                                bullet.shoot(
+                                    tankselected,
+                                    targetRow,
+                                    targetCol,
+                                    tamanoCelda,
+                                    fullPower
+                                );
+
+                                powerUpManager.useAttackPower(player);
+
+                                hayRuta = false;
+                                tankselected = nullptr;
+
+                                turnManager.nextTurn();
+                            }
                         }
                     }
                 }
@@ -326,7 +414,7 @@ int main()
 
         mapa.clear(sf::Color::Black);
 
-        hud.draw(mapa, font, tanques, turnManager, gameTimer);
+        hud.draw(mapa, font, tanques, turnManager, gameTimer, powerUpManager);
 
         dibujarmapa(mapa, map, suelo, pared, tamanoCelda, mapaOffsetX, mapaOffsetY);
 
