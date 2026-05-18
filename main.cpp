@@ -19,6 +19,15 @@
 #include "PowerUpManager.h"
 #include "PowerUp.h"
 
+
+void tryGenerateRandomPowerUp(PowerUpManager& powerUpManager, RandomGenerator& random, int jugador) {
+    int chance = random.randomEntero(1, 100);
+    if (chance <= 80) {
+		powerUpManager.addRandomPowerUp(jugador, random);
+    }
+}
+
+
 int main()
 {
     RandomGenerator random;
@@ -40,14 +49,6 @@ int main()
     tanques.agregar(TankFactory::crearTanqueCeleste(13, 12));
     tanques.agregar(TankFactory::crearTanqueAmarillo(12, 13));
     tanques.agregar(TankFactory::crearTanqueAmarillo(12, 12));
-
-    powerUpManager.addPowerUp(1, POWER_DOUBLE_TURN);
-    powerUpManager.addPowerUp(1, POWER_MOVE_PRECISION);
-    powerUpManager.addPowerUp(1, POWER_ATTACK_POWER);
-
-    powerUpManager.addPowerUp(2, POWER_DOUBLE_TURN);
-    powerUpManager.addPowerUp(2, POWER_ATTACK_PRECISION);
-    powerUpManager.addPowerUp(2, POWER_ATTACK_POWER);
 
     Tank* tankselected = nullptr;
 
@@ -263,12 +264,13 @@ int main()
                                         }
                                         else {
                                             // Red and yellow tanks use random movement
-                                            hayRuta = pathfinder.buscarRutaRandom(
+                                            hayRuta = pathfinder.rutalineavistrandom(
                                                 grafo,
                                                 map,
                                                 tanques,
                                                 tankselected,
                                                 nodoInicio,
+                                                nodoDestino,
                                                 camino,
                                                 tamanoCamino,
                                                 4,
@@ -288,6 +290,14 @@ int main()
 
                                         // This consumes the movement precision power after moving
                                         powerUpManager.useMovePrecision(player);
+
+                                        int jugadorQueTermino = turnManager.getActualPlayer();
+
+                                        tryGenerateRandomPowerUp(
+                                            powerUpManager,
+                                            random,
+                                            jugadorQueTermino
+                                        );
 
                                         turnManager.nextTurn();
                                     }
@@ -361,6 +371,13 @@ int main()
                                     powerUpManager.useAttackPower(player);
 
                                     tankselected = nullptr;
+                                    int jugadorQueTermino = turnManager.getActualPlayer();
+
+                                    tryGenerateRandomPowerUp(
+                                        powerUpManager,
+                                        random,
+                                        jugadorQueTermino
+                                    );
 
                                     turnManager.nextTurn();
                                 }
@@ -378,6 +395,14 @@ int main()
 
                                 hayRuta = false;
                                 tankselected = nullptr;
+
+                                int jugadorQueTermino = turnManager.getActualPlayer();
+
+                                tryGenerateRandomPowerUp(
+                                    powerUpManager,
+                                    random,
+                                    jugadorQueTermino
+                                );
 
                                 turnManager.nextTurn();
                             }

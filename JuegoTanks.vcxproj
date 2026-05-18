@@ -156,6 +156,7 @@
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PowerUpFactory.cpp" />
     <ClCompile Include="PowerUpManager.cpp" />
     <ClCompile Include="PowerUpQueue.cpp" />
     <ClCompile Include="Queue.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="HUD.h" />
     <ClInclude Include="Pathfinder.h" />
     <ClInclude Include="Mapa.h" />
+    <ClInclude Include="PowerUpFactory.h" />
     <ClInclude Include="PowerUpManager.h" />
     <ClInclude Include="PowerUpQueue.h" />
     <ClInclude Include="RandomGenerator.h" />
