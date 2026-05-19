@@ -51,6 +51,15 @@ private:
     const float mapaOffsetX;
     const float mapaOffsetY;
 
+    bool movimientoEnProgreso;
+    Tank* movingTank;
+
+    int caminoAnimado[Grafo::totalNodos];
+    int tamanoCaminoAnimado;
+    int indiceCaminoAnimado;
+
+    int jugadorMovimientoPendiente;
+
 public:
     Game();
 
@@ -84,4 +93,8 @@ private:
     void revisarFinDeJuego();
     void actualizarTitulo();
     void dibujar();
+
+    void iniciarMovimientoAnimado(Tank* tank, int camino[], int tamanoCamino, int jugador);
+    void actualizarMovimientoAnimado(float deltaTime);
+
 };

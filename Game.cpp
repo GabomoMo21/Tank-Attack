@@ -6,6 +6,11 @@ Game::Game()
     tankselected(nullptr),
     tamanoCamino(0),
     hayRuta(false),
+    movimientoEnProgreso(false),
+    movingTank(nullptr),
+    tamanoCaminoAnimado(0),
+    indiceCaminoAnimado(0),
+    jugadorMovimientoPendiente(0),
     tamanoCelda(40.0f),
     headerAltura(60.0f),
     mapaOffsetX(0.0f),
@@ -112,7 +117,7 @@ void Game::procesarTecla(const sf::Event::KeyPressed& keyPressed) {
 }
 
 void Game::procesarMouse(const sf::Event::MouseButtonPressed& mouseButton) {
-    if (bullet.isActive()) {
+    if (bullet.isActive() || movimientoEnProgreso) {
         return;
     }
 
@@ -211,6 +216,7 @@ void Game::moverTanqueSeleccionado(int filaDestino, int columnaDestino) {
 
     if (tankselected->gettipo() == 1) {
         if (chance <= typeOneLimit) {
+            std::cout << "Usando BFS\n";
             hayRuta = pathfinder.buscarRutaBFS(
                 grafo,
                 tanques,
@@ -222,7 +228,8 @@ void Game::moverTanqueSeleccionado(int filaDestino, int columnaDestino) {
             );
         }
         else {
-            hayRuta = pathfinder.rutalineavistrandom(
+            std::cout << "Usando RANDOM linea de vista\n";
+            hayRuta = pathfinder.rutalineavistrandom( 
                 grafo,
                 map,
                 tanques,
@@ -238,6 +245,7 @@ void Game::moverTanqueSeleccionado(int filaDestino, int columnaDestino) {
     }
     else {
         if (chance <= typeTwoLimit) {
+            std::cout << "Usando Dijkstra\n";
             hayRuta = pathfinder.buscarRutaDijkstra(
                 grafo,
                 tanques,
@@ -249,6 +257,7 @@ void Game::moverTanqueSeleccionado(int filaDestino, int columnaDestino) {
             );
         }
         else {
+            std::cout << "Usando RANDOM linea de vista2\n";
             hayRuta = pathfinder.rutalineavistrandom(
                 grafo,
                 map,
@@ -265,16 +274,12 @@ void Game::moverTanqueSeleccionado(int filaDestino, int columnaDestino) {
     }
 
     if (hayRuta && tamanoCamino > 0) {
-        int nodoFinal = camino[tamanoCamino - 1];
-
-        int nuevaFila = grafo.obtenerFila(nodoFinal);
-        int nuevaColumna = grafo.obtenerColumna(nodoFinal);
-
-        tankselected->move(nuevaFila, nuevaColumna);
-
-        powerUpManager.useMovePrecision(player);
-
-        finalizarAccion();
+        iniciarMovimientoAnimado(
+            tankselected,
+            camino,
+            tamanoCamino,
+            player
+        );
     }
 
     tankselected = nullptr;
@@ -371,12 +376,14 @@ void Game::finalizarAccion() {
 void Game::tryGenerateRandomPowerUp(int jugador) {
     int chance = random.randomEntero(1, 100);
 
-    if (chance <= 80) {
+    if (chance <= 30) {
         powerUpManager.addRandomPowerUp(jugador, random);
     }
 }
 
 void Game::actualizar(float deltaTime) {
+    actualizarMovimientoAnimado(deltaTime);
+
     bullet.update(deltaTime, map, tanques, tamanoCelda);
 }
 
@@ -487,4 +494,66 @@ void Game::dibujar() {
     );
 
     window.display();
+}
+
+void Game::iniciarMovimientoAnimado(
+    Tank* tank,
+    int camino[],
+    int tamano,
+    int jugador
+) {
+    if (tank == nullptr || tamano <= 1) {
+        return;
+    }
+
+    movingTank = tank;
+    tamanoCaminoAnimado = tamano;
+    indiceCaminoAnimado = 1;
+    movimientoEnProgreso = true;
+    jugadorMovimientoPendiente = jugador;
+
+    for (int i = 0; i < tamano; i++) {
+        caminoAnimado[i] = camino[i];
+    }
+
+    int siguienteNodo = caminoAnimado[indiceCaminoAnimado];
+
+    int siguienteFila = grafo.obtenerFila(siguienteNodo);
+    int siguienteColumna = grafo.obtenerColumna(siguienteNodo);
+
+    movingTank->startMoveTo(siguienteFila, siguienteColumna);
+}
+
+void Game::actualizarMovimientoAnimado(float deltaTime) {
+    if (!movimientoEnProgreso || movingTank == nullptr) {
+        return;
+    }
+
+    movingTank->updateMovement(deltaTime);
+
+    if (!movingTank->isMoving()) {
+        indiceCaminoAnimado++;
+
+        if (indiceCaminoAnimado < tamanoCaminoAnimado) {
+            int siguienteNodo = caminoAnimado[indiceCaminoAnimado];
+
+            int siguienteFila = grafo.obtenerFila(siguienteNodo);
+            int siguienteColumna = grafo.obtenerColumna(siguienteNodo);
+
+            movingTank->startMoveTo(siguienteFila, siguienteColumna);
+        }
+        else {
+            movimientoEnProgreso = false;
+
+            powerUpManager.useMovePrecision(jugadorMovimientoPendiente);
+
+            finalizarAccion();
+
+            movingTank = nullptr;
+            jugadorMovimientoPendiente = 0;
+
+            hayRuta = false;
+            tamanoCamino = 0;
+        }
+    }
 }

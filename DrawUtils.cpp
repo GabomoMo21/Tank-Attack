@@ -102,8 +102,8 @@ void dibujartank(
         return;
     }
 
-    float x = offsetX + tank.getcolumna() * tamanoCelda;
-    float y = offsetY + tank.getfila() * tamanoCelda;
+    float x = offsetX + tank.getVisualColumna() * tamanoCelda;
+    float y = offsetY + tank.getVisualFila() * tamanoCelda;
 
     sf::RectangleShape cuerpo;
     cuerpo.setSize({ tamanoCelda * 0.8f, tamanoCelda * 0.8f });
