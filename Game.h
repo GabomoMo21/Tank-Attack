@@ -60,6 +60,10 @@ private:
 
     int jugadorMovimientoPendiente;
 
+    bool gameOver;
+    int ganador;
+    float victoryAnimTime;
+
 public:
     Game();
 
@@ -96,5 +100,8 @@ private:
 
     void iniciarMovimientoAnimado(Tank* tank, int camino[], int tamanoCamino, int jugador);
     void actualizarMovimientoAnimado(float deltaTime);
+
+    void activarVictoria(int jugadorGanador);
+    void dibujarPantallaVictoria();
 
 };

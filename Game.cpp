@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <cmath>
 
 Game::Game()
     : gameTimer(300.0f),
@@ -11,6 +12,9 @@ Game::Game()
     tamanoCaminoAnimado(0),
     indiceCaminoAnimado(0),
     jugadorMovimientoPendiente(0),
+    gameOver(false),
+    ganador(0),
+    victoryAnimTime(0.0f),
     tamanoCelda(40.0f),
     headerAltura(60.0f),
     mapaOffsetX(0.0f),
@@ -96,6 +100,17 @@ void Game::procesarEventos() {
 }
 
 void Game::procesarTecla(const sf::Event::KeyPressed& keyPressed) {
+    if (gameOver) {
+        if (
+            keyPressed.code == sf::Keyboard::Key::Enter ||
+            keyPressed.code == sf::Keyboard::Key::Escape
+            ) {
+            window.close();
+        }
+
+        return;
+    }
+    
     if (
         keyPressed.code == sf::Keyboard::Key::LShift ||
         keyPressed.code == sf::Keyboard::Key::RShift
@@ -117,6 +132,10 @@ void Game::procesarTecla(const sf::Event::KeyPressed& keyPressed) {
 }
 
 void Game::procesarMouse(const sf::Event::MouseButtonPressed& mouseButton) {
+    if (gameOver) {
+        return;
+    }
+
     if (bullet.isActive() || movimientoEnProgreso) {
         return;
     }
@@ -384,24 +403,31 @@ void Game::tryGenerateRandomPowerUp(int jugador) {
 }
 
 void Game::actualizar(float deltaTime) {
+    if (gameOver) {
+        victoryAnimTime += deltaTime;
+        return;
+    }
+
     actualizarMovimientoAnimado(deltaTime);
 
     bullet.update(deltaTime, map, tanques, tamanoCelda);
 }
 
 void Game::revisarFinDeJuego() {
+    if (gameOver) {
+        return;
+    }
+
     int player1Alive = tanques.contarVivosJugador(1);
     int player2Alive = tanques.contarVivosJugador(2);
 
     if (player1Alive == 0) {
-        std::cout << "Player 2 wins\n";
-        window.close();
+        activarVictoria(2);
         return;
     }
 
     if (player2Alive == 0) {
-        std::cout << "Player 1 wins\n";
-        window.close();
+        activarVictoria(1);
         return;
     }
 
@@ -409,16 +435,16 @@ void Game::revisarFinDeJuego() {
         int winner = tanques.getWinnerByAliveTanks();
 
         if (winner == 1) {
-            std::cout << "Player 1 wins by time\n";
+            activarVictoria(1);
         }
         else if (winner == 2) {
-            std::cout << "Player 2 wins by time\n";
+            activarVictoria(2);
         }
         else {
-            std::cout << "Draw\n";
+            activarVictoria(0); // empate
         }
 
-        window.close();
+        return;
     }
 }
 
@@ -449,6 +475,11 @@ void Game::actualizarTitulo() {
 }
 
 void Game::dibujar() {
+    if (gameOver) {
+        dibujarPantallaVictoria();
+        return;
+    }
+
     window.clear(sf::Color::Black);
 
     hud.draw(
@@ -558,4 +589,100 @@ void Game::actualizarMovimientoAnimado(float deltaTime) {
             tamanoCamino = 0;
         }
     }
+}
+
+void Game::dibujarPantallaVictoria() {
+    window.clear(sf::Color::Black);
+
+    float pulse = 1.0f + 0.08f * std::sin(victoryAnimTime * 4.0f);
+
+    sf::RectangleShape fondo;
+    fondo.setSize({ 800.0f, 660.0f });
+    fondo.setPosition({ 0.0f, 0.0f });
+    fondo.setFillColor(sf::Color(20, 20, 30));
+    window.draw(fondo);
+
+    std::string textoVictoria;
+
+    if (ganador == 1) {
+        textoVictoria = "PLAYER 1 WINS";
+    }
+    else if (ganador == 2) {
+        textoVictoria = "PLAYER 2 WINS";
+    }
+    else {
+        textoVictoria = "DRAW";
+    }
+
+    sf::Text titulo(font);
+    titulo.setString(textoVictoria);
+    titulo.setCharacterSize(unsigned int(42 * pulse));
+    titulo.setFillColor(sf::Color::White);
+
+    sf::FloatRect bounds = titulo.getLocalBounds();
+    titulo.setOrigin({
+        bounds.position.x + bounds.size.x / 2.0f,
+        bounds.position.y + bounds.size.y / 2.0f
+        });
+
+    titulo.setPosition({ 400.0f, 250.0f });
+
+    window.draw(titulo);
+
+    sf::Text subtitulo(font);
+    subtitulo.setString("Press ENTER or ESC to exit");
+    subtitulo.setCharacterSize(20);
+    subtitulo.setFillColor(sf::Color(200, 200, 200));
+
+    sf::FloatRect subBounds = subtitulo.getLocalBounds();
+    subtitulo.setOrigin({
+        subBounds.position.x + subBounds.size.x / 2.0f,
+        subBounds.position.y + subBounds.size.y / 2.0f
+        });
+
+    subtitulo.setPosition({ 400.0f, 330.0f });
+
+    window.draw(subtitulo);
+
+    // Decoración simple: círculos animados
+    for (int i = 0; i < 12; i++) {
+        float angle = victoryAnimTime * 2.0f + i * 0.52f;
+        float radius = 120.0f + 20.0f * std::sin(victoryAnimTime * 3.0f + i);
+
+        float x = 400.0f + std::cos(angle) * radius;
+        float y = 250.0f + std::sin(angle) * radius;
+
+        sf::CircleShape circle;
+        circle.setRadius(5.0f);
+        circle.setOrigin({ 5.0f, 5.0f });
+        circle.setPosition({ x, y });
+
+        if (ganador == 1) {
+            circle.setFillColor(sf::Color::Blue);
+        }
+        else if (ganador == 2) {
+            circle.setFillColor(sf::Color::Cyan);
+        }
+        else {
+            circle.setFillColor(sf::Color::Yellow);
+        }
+
+        window.draw(circle);
+    }
+
+    window.display();
+}
+
+void Game::activarVictoria(int jugadorGanador) {
+    if (gameOver) {
+        return;
+    }
+
+    gameOver = true;
+    ganador = jugadorGanador;
+    victoryAnimTime = 0.0f;
+
+    tankselected = nullptr;
+    hayRuta = false;
+    tamanoCamino = 0;
 }

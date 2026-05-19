@@ -1,13 +1,2 @@
-﻿  Bullet.cpp
-  DrawUtils.cpp
-  Game.cpp
-  HUD.cpp
-  Pathfinder.cpp
-C:\Users\gabri\Desktop\JuegoTanks\Pathfinder.cpp(388,9): warning C4101: 'caminoTemporal': variable local sin referencia
-  Tank.cpp
-C:\Users\gabri\Desktop\JuegoTanks\Tank.cpp(100,27): warning C4244: '=': conversión de 'float' a 'int'; posible pérdida de datos
-  TankFactory.cpp
-  TankList.cpp
-  main.cpp
-  Generando código...
+﻿  Game.cpp
   JuegoTanks.vcxproj -> C:\Users\gabri\Desktop\JuegoTanks\x64\Debug\JuegoTanks.exe
