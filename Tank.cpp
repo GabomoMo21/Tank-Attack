@@ -97,7 +97,7 @@ void Tank::updateMovement(float deltaTime) {
     float distancia = std::sqrt(df * df + dc * dc);
 
     if (distancia <= 0.01f) {
-        targetfila = float(targetfila);
+        visualfila = float(targetfila);
         visualcolumna = float(targetcolumna);
 
         fila = targetfila;
