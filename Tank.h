@@ -42,5 +42,6 @@ public:
     bool incell(int filaclick, int columnaclick);
     void getdamage(int damage);
 
-
+    float getCannonAngle();
+    void aimAtCell(int targetRow, int targetCol);
 };

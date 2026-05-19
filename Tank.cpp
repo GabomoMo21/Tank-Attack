@@ -124,4 +124,19 @@ void Tank::updateMovement(float deltaTime) {
     }
 }
 
+float Tank::getCannonAngle() {
+    return cannonAngle;
+}
 
+void Tank::aimAtCell(int targetRow, int targetCol) {
+    float tankCenterX = visualcolumna + 0.5f;
+    float tankCenterY = visualfila + 0.5f;
+
+    float targetCenterX = float(targetCol) + 0.5f;
+    float targetCenterY = float(targetRow) + 0.5f;
+
+    float dx = targetCenterX - tankCenterX;
+    float dy = targetCenterY - tankCenterY;
+
+    cannonAngle = std::atan2(dy, dx) * 180.0f / 3.14159265f;
+}

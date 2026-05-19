@@ -111,8 +111,13 @@ void dibujartank(
     cuerpo.setFillColor(tank.getcolor());
 
     sf::RectangleShape canon;
-    canon.setSize({ tamanoCelda * 0.15f, tamanoCelda * 0.45f });
-    canon.setPosition({ x + tamanoCelda * 0.425f, y });
+    canon.setSize({ tamanoCelda * 0.45f, tamanoCelda * 0.15f });
+    canon.setOrigin({ 0.0f, tamanoCelda * 0.075f });
+    canon.setPosition({
+        x + tamanoCelda * 0.5f,
+        y + tamanoCelda * 0.5f
+        });
+    canon.setRotation(sf::degrees(tank.getCannonAngle()));
     canon.setFillColor(sf::Color::Black);
 
     ventana.draw(cuerpo);

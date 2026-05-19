@@ -305,6 +305,8 @@ void Game::manejarClickDerecho(int targetRow, int targetCol) {
 void Game::dispararTanqueSeleccionado(int targetRow, int targetCol) {
     int player = tankselected->getplayer();
 
+    tankselected->aimAtCell(targetRow, targetCol);
+
     bool fullPower = powerUpManager.hasAttackPower(player);
     bool attackPrecision = powerUpManager.hasAttackPrecision(player);
 

@@ -5,7 +5,7 @@
   Pathfinder.cpp
 C:\Users\gabri\Desktop\JuegoTanks\Pathfinder.cpp(388,9): warning C4101: 'caminoTemporal': variable local sin referencia
   Tank.cpp
-C:\Users\gabri\Desktop\JuegoTanks\Tank.cpp(98,27): warning C4244: '=': conversión de 'float' a 'int'; posible pérdida de datos
+C:\Users\gabri\Desktop\JuegoTanks\Tank.cpp(100,27): warning C4244: '=': conversión de 'float' a 'int'; posible pérdida de datos
   TankFactory.cpp
   TankList.cpp
   main.cpp
