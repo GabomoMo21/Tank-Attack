@@ -24,7 +24,7 @@ public:
     void addRandomPowerUp(int player, RandomGenerator& random);
     void addPowerUp(int player, int type);
 
-    void consumePowerUp(int player, TurnManager& turnManager);
+    bool consumePowerUp(int player, TurnManager& turnManager);
 
     bool hasMovePrecision(int player);
     bool hasAttackPrecision(int player);

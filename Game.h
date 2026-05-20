@@ -19,6 +19,7 @@
 #include "HUD.h"
 #include "PowerUpManager.h"
 #include "PowerUp.h"
+#include "AudioManager.h"
 
 class Game {
 private:
@@ -32,6 +33,7 @@ private:
     HUD hud;
     PowerUpManager powerUpManager;
     Bullet bullet;
+    AudioManager audioManager;
 
     sf::RenderWindow window;
     sf::Clock gameClock;
@@ -63,6 +65,10 @@ private:
     bool gameOver;
     int ganador;
     float victoryAnimTime;
+
+    void dibujarBotones();
+    bool clickEnMute(int mouseX, int mouseY);
+    bool clickEnExit(int mouseX, int mouseY);
 
 public:
     Game();

@@ -69,7 +69,7 @@ void Bullet::shoot(Tank* shooter, int targetRow, int targetCol, float cellSize, 
     useAStarRoute = false;
     routeSize = 0;
     routeIndex = 0;
-
+    killedTank = false;
     bounceCount = 0;
     canHitOwner = false;
 
@@ -106,6 +106,7 @@ void Bullet::shootAStar(
     float cellSize,
     bool fullPower,
     Grafo& grafo
+    
 ) {
     if (shooter == nullptr) {
         return;
@@ -201,7 +202,9 @@ void Bullet::update(float deltaTime, Mapa& map, listaTank& tanks, float cellSize
             }
 
             hitTank->getdamage(damage);
-
+            if (!hitTank->estavivo()) {
+                killedTank = true;
+            }
             active = false;
         }
 
@@ -316,7 +319,9 @@ void Bullet::update(float deltaTime, Mapa& map, listaTank& tanks, float cellSize
         }
 
         hitTank->getdamage(damage);
-
+        if (!hitTank->estavivo()) {
+            killedTank = true;
+        }
         active = false;
     }
 }
@@ -361,4 +366,12 @@ void Bullet::draw(sf::RenderWindow& window, float offsetX, float offsetY) {
 void Bullet::deactivate() {
     active = false;
 	clearTrail();
+}
+bool Bullet::didKillTank() {
+    if (killedTank) {
+        killedTank = false;
+        return true;
+    }
+
+    return false;
 }

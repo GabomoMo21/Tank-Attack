@@ -29,12 +29,12 @@ void PowerUpManager::addPowerUp(int player, int type) {
     }
 }
 
-void PowerUpManager::consumePowerUp(int player, TurnManager& turnManager) {
+bool PowerUpManager::consumePowerUp(int player, TurnManager& turnManager) {
     PowerUp powerUp;
 
     if (player == 1) {
         if (player1Queue.empty()) {
-            return;
+            return false;
         }
 
         powerUp = player1Queue.getFront();
@@ -42,7 +42,7 @@ void PowerUpManager::consumePowerUp(int player, TurnManager& turnManager) {
     }
     else {
         if (player2Queue.empty()) {
-            return;
+            return false;
         }
 
         powerUp = player2Queue.getFront();
@@ -83,6 +83,7 @@ void PowerUpManager::consumePowerUp(int player, TurnManager& turnManager) {
     }
 
     turnManager.nextTurn();
+    return true;
 }
 
 bool PowerUpManager::hasMovePrecision(int player) {

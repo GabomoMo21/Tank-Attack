@@ -71,6 +71,8 @@ bool Game::cargarAssets() {
         std::cout << "Error loading font\n";
         return false;
     }
+    audioManager.load();
+    audioManager.playMusic();
 
     return true;
 }
@@ -118,13 +120,16 @@ void Game::procesarTecla(const sf::Event::KeyPressed& keyPressed) {
         if (!bullet.isActive()) {
             int player = turnManager.getActualPlayer();
 
-            powerUpManager.consumePowerUp(player, turnManager);
+            bool consumed = powerUpManager.consumePowerUp(player, turnManager);
 
-            tankselected = nullptr;
-            hayRuta = false;
-            tamanoCamino = 0;
-            bullet.clearTrail();
+            if (consumed) {
+                audioManager.playPowerUp();
 
+                tankselected = nullptr;
+                hayRuta = false;
+                tamanoCamino = 0;
+                bullet.clearTrail();
+            }
             // Si el power-up debe consumir turno, activa esto:
             // finalizarAccion();
         }
@@ -135,7 +140,19 @@ void Game::procesarMouse(const sf::Event::MouseButtonPressed& mouseButton) {
     if (gameOver) {
         return;
     }
+    if (mouseButton.button == sf::Mouse::Button::Left) {
+        if (clickEnMute(mouseButton.position.x, mouseButton.position.y)) {
+            audioManager.playButton();
+            audioManager.toggleMute();
+            return;
+        }
 
+        if (clickEnExit(mouseButton.position.x, mouseButton.position.y)) {
+            audioManager.playButton();
+            window.close();
+            return;
+        }
+    }
     if (bullet.isActive() || movimientoEnProgreso) {
         return;
     }
@@ -359,6 +376,7 @@ void Game::dispararTanqueSeleccionado(int targetRow, int targetCol) {
                 fullPower,
                 grafo
             );
+            audioManager.playShoot();
 
             powerUpManager.useAttackPrecision(player);
             powerUpManager.useAttackPower(player);
@@ -376,6 +394,7 @@ void Game::dispararTanqueSeleccionado(int targetRow, int targetCol) {
             tamanoCelda,
             fullPower
         );
+        audioManager.playShoot();
 
         powerUpManager.useAttackPower(player);
 
@@ -525,7 +544,7 @@ void Game::dibujar() {
         mapaOffsetX,
         mapaOffsetY
     );
-
+    dibujarBotones();
     window.display();
 }
 
@@ -555,6 +574,7 @@ void Game::iniciarMovimientoAnimado(
     int siguienteColumna = grafo.obtenerColumna(siguienteNodo);
 
     movingTank->startMoveTo(siguienteFila, siguienteColumna);
+    audioManager.playMove();
 }
 
 void Game::actualizarMovimientoAnimado(float deltaTime) {
@@ -576,6 +596,7 @@ void Game::actualizarMovimientoAnimado(float deltaTime) {
             movingTank->startMoveTo(siguienteFila, siguienteColumna);
         }
         else {
+            audioManager.stopMove();
             movimientoEnProgreso = false;
 
             powerUpManager.useMovePrecision(jugadorMovimientoPendiente);
@@ -589,6 +610,7 @@ void Game::actualizarMovimientoAnimado(float deltaTime) {
             tamanoCamino = 0;
         }
     }
+   
 }
 
 void Game::dibujarPantallaVictoria() {
@@ -685,4 +707,59 @@ void Game::activarVictoria(int jugadorGanador) {
     tankselected = nullptr;
     hayRuta = false;
     tamanoCamino = 0;
+}
+bool Game::clickEnMute(int mouseX, int mouseY) {
+    return
+        mouseX >= 620 &&
+        mouseX <= 690 &&
+        mouseY >= 610 &&
+        mouseY <= 640;
+}
+
+bool Game::clickEnExit(int mouseX, int mouseY) {
+    return
+        mouseX >= 710 &&
+        mouseX <= 780 &&
+        mouseY >= 610 &&
+        mouseY <= 640;
+}
+void Game::dibujarBotones() {
+    sf::RectangleShape muteShape;
+    muteShape.setSize({ 70.0f, 30.0f });
+    muteShape.setPosition({ 620.0f, 610.0f });
+    muteShape.setFillColor(sf::Color(40, 40, 40));
+    muteShape.setOutlineColor(sf::Color::White);
+    muteShape.setOutlineThickness(1.0f);
+    window.draw(muteShape);
+
+    sf::Text muteText(font);
+
+    if (audioManager.isMuted()) {
+        muteText.setString("UNMUTE");
+        muteText.setCharacterSize(12);
+        muteText.setPosition({ 624.0f, 616.0f });
+    }
+    else {
+        muteText.setString("MUTE");
+        muteText.setCharacterSize(13);
+        muteText.setPosition({ 633.0f, 616.0f });
+    }
+
+    muteText.setFillColor(sf::Color::White);
+    window.draw(muteText);
+
+    sf::RectangleShape exitShape;
+    exitShape.setSize({ 70.0f, 30.0f });
+    exitShape.setPosition({ 710.0f, 610.0f });
+    exitShape.setFillColor(sf::Color(40, 40, 40));
+    exitShape.setOutlineColor(sf::Color::White);
+    exitShape.setOutlineThickness(1.0f);
+    window.draw(exitShape);
+
+    sf::Text exitText(font);
+    exitText.setString("EXIT");
+    exitText.setCharacterSize(13);
+    exitText.setFillColor(sf::Color::White);
+    exitText.setPosition({ 725.0f, 616.0f });
+    window.draw(exitText);
 }

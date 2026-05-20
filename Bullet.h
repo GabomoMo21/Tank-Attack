@@ -33,7 +33,7 @@ private:
     int routeCols[400];
     int routeSize;
     int routeIndex;
-
+    bool killedTank;
 public:
     Bullet();
 
@@ -55,4 +55,5 @@ public:
         bool fullPower,
         Grafo& grafo
     );
+    bool didKillTank();
 };
