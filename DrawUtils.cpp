@@ -139,3 +139,81 @@ void dibujartank(
     ventana.draw(lifeBack);
     ventana.draw(lifeBar);
 }
+void dibujarRutaRandom(
+    sf::RenderWindow& ventana,
+    Grafo& grafo,
+    int camino[],
+    int tamanoCamino,
+    int finIntento1,
+    int finRandom,
+    int finIntento2,
+    float tamanoCelda,
+    float offsetX,
+    float offsetY
+) {
+    for (int i = 1; i < tamanoCamino; i++) {
+        int nodo = camino[i];
+
+        int fila = grafo.obtenerFila(nodo);
+        int columna = grafo.obtenerColumna(nodo);
+
+        sf::RectangleShape celdaRuta;
+        celdaRuta.setSize({ tamanoCelda, tamanoCelda });
+
+        celdaRuta.setPosition({
+            offsetX + columna * tamanoCelda,
+            offsetY + fila * tamanoCelda
+            });
+
+        // First try: white
+        if (i <= finIntento1) {
+            celdaRuta.setFillColor(sf::Color(255, 255, 255, 120));
+        }
+        // Random correction: yellow
+        else if (i <= finRandom) {
+            celdaRuta.setFillColor(sf::Color(255, 255, 0, 130));
+        }
+        // Second try: green
+        else {
+            celdaRuta.setFillColor(sf::Color(0, 255, 0, 130));
+        }
+
+        ventana.draw(celdaRuta);
+    }
+}
+void dibujarLineaVista(
+    sf::RenderWindow& ventana,
+    Grafo& grafo,
+    int nodoInicio,
+    int nodoFin,
+    float tamanoCelda,
+    float offsetX,
+    float offsetY,
+    sf::Color color
+) {
+    if (nodoInicio == -1 || nodoFin == -1) {
+        return;
+    }
+
+    int filaInicio = grafo.obtenerFila(nodoInicio);
+    int columnaInicio = grafo.obtenerColumna(nodoInicio);
+
+    int filaFin = grafo.obtenerFila(nodoFin);
+    int columnaFin = grafo.obtenerColumna(nodoFin);
+
+    float x1 = offsetX + columnaInicio * tamanoCelda + tamanoCelda / 2.0f;
+    float y1 = offsetY + filaInicio * tamanoCelda + tamanoCelda / 2.0f;
+
+    float x2 = offsetX + columnaFin * tamanoCelda + tamanoCelda / 2.0f;
+    float y2 = offsetY + filaFin * tamanoCelda + tamanoCelda / 2.0f;
+
+    sf::VertexArray line(sf::PrimitiveType::Lines, 2);
+
+    line[0].position = { x1, y1 };
+    line[0].color = color;
+
+    line[1].position = { x2, y2 };
+    line[1].color = color;
+
+    ventana.draw(line);
+}

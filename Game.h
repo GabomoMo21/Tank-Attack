@@ -69,7 +69,20 @@ private:
     void dibujarBotones();
     bool clickEnMute(int mouseX, int mouseY);
     bool clickEnExit(int mouseX, int mouseY);
+    int finIntento1;
+    int finRandom;
+    int finIntento2;
+    int vistaInicio1;
+    int vistaFin1;
 
+    int vistaInicioRandom;
+    int vistaFinRandom;
+
+    int vistaInicio2;
+    int vistaFin2;
+    bool rutaRandomVisible;
+
+  
 public:
     Game();
 

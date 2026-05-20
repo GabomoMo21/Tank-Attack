@@ -42,3 +42,25 @@ void dibujartank(
     float offsetX,
     float offsetY
 );
+void dibujarRutaRandom(
+    sf::RenderWindow& ventana,
+    Grafo& grafo,
+    int camino[],
+    int tamanoCamino,
+    int finIntento1,
+    int finRandom,
+    int finIntento2,
+    float tamanoCelda,
+    float offsetX,
+    float offsetY
+);
+void dibujarLineaVista(
+    sf::RenderWindow& ventana,
+    Grafo& grafo,
+    int nodoInicio,
+    int nodoFin,
+    float tamanoCelda,
+    float offsetX,
+    float offsetY,
+    sf::Color color
+);

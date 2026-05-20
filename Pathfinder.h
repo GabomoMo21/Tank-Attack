@@ -69,7 +69,10 @@ public:
         int nodoDestino,
         int camino[],
         int& tamanoCamino,
-		int radio,
-		RandomGenerator& random
+        int& finIntento1,
+        int& finRandom,
+        int& finIntento2,
+        int radio,
+        RandomGenerator& random
     );
 };

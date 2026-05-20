@@ -18,7 +18,18 @@ Game::Game()
     tamanoCelda(40.0f),
     headerAltura(60.0f),
     mapaOffsetX(0.0f),
-    mapaOffsetY(60.0f)
+    mapaOffsetY(60.0f),
+    finIntento1(-1),
+    finRandom(-1),
+    finIntento2(-1),
+    vistaInicio1(-1),
+    vistaFin1(-1),
+    vistaInicioRandom(-1),
+    vistaFinRandom(-1),
+    vistaInicio2(-1),
+    vistaFin2(-1),
+    rutaRandomVisible(false)
+
 {
 }
 
@@ -213,6 +224,20 @@ void Game::seleccionarTanque(int fila, int columna) {
         if (turnManager.isPlayerTurn(tankselected->getplayer())) {
             hayRuta = false;
             tamanoCamino = 0;
+            hayRuta = false;
+            tamanoCamino = 0;
+
+            rutaRandomVisible = false;
+            finIntento1 = -1;
+            finRandom = -1;
+            finIntento2 = -1;
+
+            vistaInicio1 = -1;
+            vistaFin1 = -1;
+            vistaInicioRandom = -1;
+            vistaFinRandom = -1;
+            vistaInicio2 = -1;
+            vistaFin2 = -1;
             bullet.clearTrail();
         }
         else {
@@ -253,6 +278,10 @@ void Game::moverTanqueSeleccionado(int filaDestino, int columnaDestino) {
     if (tankselected->gettipo() == 1) {
         if (chance <= typeOneLimit) {
             std::cout << "Usando BFS\n";
+            rutaRandomVisible = false;
+            finIntento1 = -1;
+            finRandom = -1;
+            finIntento2 = -1;
             hayRuta = pathfinder.buscarRutaBFS(
                 grafo,
                 tanques,
@@ -265,7 +294,16 @@ void Game::moverTanqueSeleccionado(int filaDestino, int columnaDestino) {
         }
         else {
             std::cout << "Usando RANDOM linea de vista\n";
-            hayRuta = pathfinder.rutalineavistrandom( 
+            rutaRandomVisible = true;
+
+            vistaInicio1 = nodoInicio;
+            vistaFin1 = nodoDestino;
+            vistaInicioRandom = -1;
+            vistaFinRandom = -1;
+            vistaInicio2 = -1;
+            vistaFin2 = -1;
+
+            hayRuta = pathfinder.rutalineavistrandom(
                 grafo,
                 map,
                 tanques,
@@ -274,14 +312,25 @@ void Game::moverTanqueSeleccionado(int filaDestino, int columnaDestino) {
                 nodoDestino,
                 camino,
                 tamanoCamino,
+                finIntento1,
+                finRandom,
+                finIntento2,
                 4,
                 random
             );
+
+            if (tamanoCamino > 1) {
+                vistaInicio2 = camino[tamanoCamino - 1];
+                vistaFin2 = nodoDestino;
+            }
         }
     }
     else {
         if (chance <= typeTwoLimit) {
-            std::cout << "Usando Dijkstra\n";
+            //std::cout << "Usando Dijkstra\n";rutaRandomVisible = false;
+            finIntento1 = -1;
+            finRandom = -1;
+            finIntento2 = -1;
             hayRuta = pathfinder.buscarRutaDijkstra(
                 grafo,
                 tanques,
@@ -294,6 +343,15 @@ void Game::moverTanqueSeleccionado(int filaDestino, int columnaDestino) {
         }
         else {
             std::cout << "Usando RANDOM linea de vista2\n";
+            rutaRandomVisible = true;
+
+            vistaInicio1 = nodoInicio;
+            vistaFin1 = nodoDestino;
+            vistaInicioRandom = -1;
+            vistaFinRandom = -1;
+            vistaInicio2 = -1;
+            vistaFin2 = -1;
+
             hayRuta = pathfinder.rutalineavistrandom(
                 grafo,
                 map,
@@ -303,9 +361,17 @@ void Game::moverTanqueSeleccionado(int filaDestino, int columnaDestino) {
                 nodoDestino,
                 camino,
                 tamanoCamino,
+                finIntento1,
+                finRandom,
+                finIntento2,
                 4,
                 random
             );
+
+            if (tamanoCamino > 1) {
+                vistaInicio2 = camino[tamanoCamino - 1];
+                vistaFin2 = nodoDestino;
+            }
         }
     }
 
@@ -521,15 +587,53 @@ void Game::dibujar() {
     );
 
     if (hayRuta) {
-        dibujarRuta(
-            window,
-            grafo,
-            camino,
-            tamanoCamino,
-            tamanoCelda,
-            mapaOffsetX,
-            mapaOffsetY
-        );
+        if (rutaRandomVisible) {
+            dibujarLineaVista(
+                window,
+                grafo,
+                vistaInicio1,
+                vistaFin1,
+                tamanoCelda,
+                mapaOffsetX,
+                mapaOffsetY,
+                sf::Color(255, 255, 255, 180)
+            );
+
+            dibujarLineaVista(
+                window,
+                grafo,
+                vistaInicio2,
+                vistaFin2,
+                tamanoCelda,
+                mapaOffsetX,
+                mapaOffsetY,
+                sf::Color(0, 255, 0, 180)
+            );
+
+            dibujarRutaRandom(
+                window,
+                grafo,
+                camino,
+                tamanoCamino,
+                finIntento1,
+                finRandom,
+                finIntento2,
+                tamanoCelda,
+                mapaOffsetX,
+                mapaOffsetY
+            );
+        }
+        else {
+            dibujarRuta(
+                window,
+                grafo,
+                camino,
+                tamanoCamino,
+                tamanoCelda,
+                mapaOffsetX,
+                mapaOffsetY
+            );
+        }
     }
 
     tanques.dibujarTodos(
@@ -608,6 +712,11 @@ void Game::actualizarMovimientoAnimado(float deltaTime) {
 
             hayRuta = false;
             tamanoCamino = 0;
+
+            rutaRandomVisible = false;
+            finIntento1 = -1;
+            finRandom = -1;
+            finIntento2 = -1;
         }
     }
    
