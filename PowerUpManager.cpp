@@ -1,5 +1,6 @@
 #include "PowerUpManager.h"
 #include "PowerUp.h"
+#include "PowerUpFactory.h"
 
 PowerUpManager::PowerUpManager() {
     movePrecisionPlayer1 = false;
@@ -13,7 +14,7 @@ PowerUpManager::PowerUpManager() {
 }
 
 void PowerUpManager::addRandomPowerUp(int player, RandomGenerator& random) {
-    int type = random.randomEntero(1, 4);
+    int type = PowerUpFactory::createRandomPowerUp(random);
     addPowerUp(player, type);
 }
 

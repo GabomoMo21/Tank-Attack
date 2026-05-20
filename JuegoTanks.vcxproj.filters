@@ -66,6 +66,12 @@
     <ClCompile Include="PowerUpManager.cpp">
       <Filter>Archivos de recursos</Filter>
     </ClCompile>
+    <ClCompile Include="PowerUpFactory.cpp">
+      <Filter>Archivos de recursos</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Archivos de recursos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Queue.h">
@@ -114,6 +120,12 @@
       <Filter>Archivos de recursos</Filter>
     </ClInclude>
     <ClInclude Include="PowerUpManager.h">
+      <Filter>Archivos de recursos</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerUpFactory.h">
+      <Filter>Archivos de recursos</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
       <Filter>Archivos de recursos</Filter>
     </ClInclude>
   </ItemGroup>

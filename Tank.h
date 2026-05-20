@@ -11,6 +11,13 @@ public:
     int vida;
     bool vivo;
     sf::Color color;
+    float visualfila;
+	float visualcolumna;
+	int targetfila;
+	int targetcolumna;
+	bool moving;
+	float moveSpeed;
+    float cannonAngle;
 
     Tank(int fila, int columna, int tipo, int jugador, sf::Color color);
 
@@ -23,8 +30,18 @@ public:
 
     sf::Color getcolor();
 
+    float getVisualFila();
+    float getVisualColumna();
+
     void move(int nuevaFila, int nuevaColumna);
+
+    void startMoveTo(int nuevaFila, int nuevaColumna);
+    void updateMovement(float deltaTime);
+    bool isMoving();
+
     bool incell(int filaclick, int columnaclick);
     void getdamage(int damage);
 
+    float getCannonAngle();
+    void aimAtCell(int targetRow, int targetCol);
 };
