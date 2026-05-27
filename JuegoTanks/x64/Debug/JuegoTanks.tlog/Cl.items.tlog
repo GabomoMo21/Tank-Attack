@@ -1,6 +1,13 @@
+C:\Users\gabri\Desktop\JuegoTanks\AudioManager.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\AudioManager.obj
 C:\Users\gabri\Desktop\JuegoTanks\Bullet.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\Bullet.obj
 C:\Users\gabri\Desktop\JuegoTanks\DrawUtils.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\DrawUtils.obj
 C:\Users\gabri\Desktop\JuegoTanks\Game.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\Game.obj
+C:\Users\gabri\Desktop\JuegoTanks\GameCombat.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\GameCombat.obj
+C:\Users\gabri\Desktop\JuegoTanks\GameInput.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\GameInput.obj
+C:\Users\gabri\Desktop\JuegoTanks\GameMovement.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\GameMovement.obj
+C:\Users\gabri\Desktop\JuegoTanks\GameRender.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\GameRender.obj
+C:\Users\gabri\Desktop\JuegoTanks\GameRules.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\GameRules.obj
+C:\Users\gabri\Desktop\JuegoTanks\GameSetup.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\GameSetup.obj
 C:\Users\gabri\Desktop\JuegoTanks\GameTimer.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\GameTimer.obj
 C:\Users\gabri\Desktop\JuegoTanks\HUD.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\HUD.obj
 C:\Users\gabri\Desktop\JuegoTanks\main.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\main.obj

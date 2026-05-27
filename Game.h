@@ -108,6 +108,9 @@ private:
     void moverTanqueSeleccionado(int filaDestino, int columnaDestino);
     void dispararTanqueSeleccionado(int targetRow, int targetCol);
 
+    void resetRutaRandomVisual();
+    void calcularRutaRandom(int nodoInicio, int nodoDestino);
+
     void finalizarAccion();
 
     void tryGenerateRandomPowerUp(int jugador);
@@ -122,5 +125,7 @@ private:
 
     void activarVictoria(int jugadorGanador);
     void dibujarPantallaVictoria();
+
+
 
 };
