@@ -1,2 +1,9 @@
-﻿  Game.cpp
+﻿  PathfinderAStar.cpp
+  PathfinderBFS.cpp
+  PathfinderDijkstra.cpp
+  PathfinderLineaVist.cpp
+  PathfinderRandom.cpp
+  Grafo.cpp
+  Pathfinder.cpp
+  Generando código...
   JuegoTanks.vcxproj -> C:\Users\gabri\Desktop\JuegoTanks\x64\Debug\JuegoTanks.exe

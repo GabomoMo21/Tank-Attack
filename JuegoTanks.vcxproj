@@ -164,6 +164,11 @@
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PathfinderAStar.cpp" />
+    <ClCompile Include="PathfinderBFS.cpp" />
+    <ClCompile Include="PathfinderDijkstra.cpp" />
+    <ClCompile Include="PathfinderLineaVist.cpp" />
+    <ClCompile Include="PathfinderRandom.cpp" />
     <ClCompile Include="PowerUpFactory.cpp" />
     <ClCompile Include="PowerUpManager.cpp" />
     <ClCompile Include="PowerUpQueue.cpp" />

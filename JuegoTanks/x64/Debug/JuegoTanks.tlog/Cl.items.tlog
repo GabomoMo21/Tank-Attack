@@ -11,6 +11,11 @@ C:\Users\gabri\Desktop\JuegoTanks\GameSetup.cpp;C:\Users\gabri\Desktop\JuegoTank
 C:\Users\gabri\Desktop\JuegoTanks\GameTimer.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\GameTimer.obj
 C:\Users\gabri\Desktop\JuegoTanks\HUD.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\HUD.obj
 C:\Users\gabri\Desktop\JuegoTanks\main.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\main.obj
+C:\Users\gabri\Desktop\JuegoTanks\PathfinderAStar.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\PathfinderAStar.obj
+C:\Users\gabri\Desktop\JuegoTanks\PathfinderBFS.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\PathfinderBFS.obj
+C:\Users\gabri\Desktop\JuegoTanks\PathfinderDijkstra.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\PathfinderDijkstra.obj
+C:\Users\gabri\Desktop\JuegoTanks\PathfinderLineaVist.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\PathfinderLineaVist.obj
+C:\Users\gabri\Desktop\JuegoTanks\PathfinderRandom.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\PathfinderRandom.obj
 C:\Users\gabri\Desktop\JuegoTanks\PowerUpFactory.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\PowerUpFactory.obj
 C:\Users\gabri\Desktop\JuegoTanks\PowerUpManager.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\PowerUpManager.obj
 C:\Users\gabri\Desktop\JuegoTanks\PowerUpQueue.cpp;C:\Users\gabri\Desktop\JuegoTanks\JuegoTanks\x64\Debug\PowerUpQueue.obj
